@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**************************
  * user input
  *
@@ -43,4 +42,3 @@ void playerkeys(){
 	}
 }
 
->>>>>>> c3fdc3af2b19719bbc8db391f9a43f7964aaaee5
