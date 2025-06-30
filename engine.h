@@ -538,7 +538,7 @@ struct responsiveGuiObjects{
 };
 int customeobjectfloor(struct totalassets *floor){
 	//char* path = "textures//floor.BMP";
-	floor->floor.texture.filepath = "..\\spiralenginev3\\textures\\floor.BMP";
+	floor->floor.texture.filepath = "...\\textures\\floor.BMP";
 	double *** rettextarray = &floor->floor.texture.texture3dArray;
 	int ret = getBMPTextures(floor->floor.texture.filepath, rettextarray, &floor->floor.texture.width, &floor->floor.texture.height);
 	if(ret == 1){
