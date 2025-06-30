@@ -273,27 +273,30 @@ int findclosetcoordinate(double *inputx, double *inputy, int size, double findx,
     if (size <= 0 || inputx == NULL || inputy == NULL || index == NULL) {
         return -1; // error: bad input
     }
-    if (1==1){
-    	double minDistance = DBL_MAX;
-	    int indexOfSmallest = 0;
-		int  i;
-		//ShowPopup(":< 14234qq debug", "insfombia error cause yes!");
-	    for (i = 0; i < size; i++) {
-	        double dx = inputx[i] - findx;
-	        double dy = inputy[i] - findy;
-	        double dist = sqrt(dx * dx + dy * dy);
-	
-	        if (dist < minDistance) {
-	            minDistance = dist;
-	            indexOfSmallest = i;
-	        }
+
+    double minDistance = DBL_MAX;
+	int indexOfSmallest = 0;
+	int  i;
+//ShowPopup(":< 14234qq debug", "insfombia error cause yes!");
+    double dist;
+    double dx;
+    double dy;
+	for (i = 0; i < size; i++) {
+		if((inputx[i])>1 && (inputy[i])>1){
+			
+		}else{
+			dx = inputx[i] - findx;
+	    	dy = inputy[i] - findy;
+	    	dist = (dx+dy) *0.5;
+		}
+	    if (dist < minDistance) {
+	        minDistance = dist;
+	        indexOfSmallest = i;
 	    }
-		//ShowPopup(":< 14234qq debug", "insfombia error cause yes!");
-	    *index = indexOfSmallest;
-	}else{
-		ShowPopup("exception triggered in find index", "insfombia error cause yes!");
-		*index  = size;
 	}
+	//ShowPopup(":< 14234qq debug", "insfombia error cause yes!");
+	*index = indexOfSmallest;
+
     return 0;
 }
 struct Textures{
@@ -538,7 +541,7 @@ struct responsiveGuiObjects{
 };
 int customeobjectfloor(struct totalassets *floor){
 	//char* path = "textures//floor.BMP";
-	floor->floor.texture.filepath = "...\\textures\\floor.BMP";
+	floor->floor.texture.filepath = "...\\\\Game-c-engine-spiral\\\\textures\\\\floor.BMP";
 	double *** rettextarray = &floor->floor.texture.texture3dArray;
 	int ret = getBMPTextures(floor->floor.texture.filepath, rettextarray, &floor->floor.texture.width, &floor->floor.texture.height);
 	if(ret == 1){
