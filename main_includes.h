@@ -10,7 +10,8 @@
 #include <io.h>
 #include <fcntl.h>
 #include <time.h>
-
+#include <errno.h>
+#include <direct.h> 
 #include "physics.h"
 #include "userinput.h"
 #include "logicalpositional.h"

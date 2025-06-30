@@ -335,12 +335,28 @@ typedef struct {
 #pragma pack(pop)
 
 int getBMPTextures(char* filename, double ***textures, int* widthr, int* heightr) {
-    FILE *fp = fopen(filename, "rb");
-    if (!fp) {
-    	ShowPopup("er file open not", "error");
-        printf("Error: Cannot open file.\n");
-        return 1;
-    }
+    char debugMessage[1024];
+	char cwd[1024];
+	
+	if (_getcwd(cwd, sizeof(cwd)) == NULL) {
+	    strcpy(cwd, "Unknown");
+	}
+	
+	FILE *fp = fopen(filename, "rb");
+	if (!fp) {
+	    // Compose a detailed error message
+	    snprintf(debugMessage, sizeof(debugMessage),
+	             "Failed to open file:\n%s\n\nWorking directory:\n%s\n\nError:\n%s",
+	             filename, cwd, strerror(errno));
+	
+	    // Show popup with detailed info
+	    ShowPopup(debugMessage, "File Open Error");
+	
+	    // Also log to console for developers
+	    printf("DEBUG: %s\n", debugMessage);
+	
+	    return 1;
+	}
     BMPHeader bmpHeader;
     BMPInfoHeader bmpInfo;
     fread(&bmpHeader, sizeof(BMPHeader), 1, fp);
@@ -541,7 +557,7 @@ struct responsiveGuiObjects{
 };
 int customeobjectfloor(struct totalassets *floor){
 	//char* path = "textures//floor.BMP";
-	floor->floor.texture.filepath = "...\\\\Game-c-engine-spiral\\\\textures\\\\floor.BMP";
+	floor->floor.texture.filepath = "C:\\Users\\maxik\\Documents\\school\\ASPIRE\\y10 agriculture fps\\spiralenginev3\\Game-c-engine-spiral\\textures\\floor.BMP";
 	double *** rettextarray = &floor->floor.texture.texture3dArray;
 	int ret = getBMPTextures(floor->floor.texture.filepath, rettextarray, &floor->floor.texture.width, &floor->floor.texture.height);
 	if(ret == 1){
