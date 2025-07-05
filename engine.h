@@ -8,11 +8,16 @@
 #define RGBl 3
 #include <string.h>
 
+
+
+void ShowPopup(const char* message, const char* title) { MessageBox(NULL, message, title, MB_OK | MB_ICONINFORMATION); }
+
 void append(void **array, size_t *size, size_t *capacity, size_t element_size, void *value) {
     if (*size >= *capacity) {
         *capacity = (*capacity == 0) ? 4 : (*capacity * 2);
         void *new_array = realloc(*array, *capacity * element_size);
         if (!new_array) {
+        	ShowPopup("width below 333", "insfombia error cause yes!");
             fprintf(stderr, "Memory allocation failed\n");
             exit(1);
         }
@@ -22,8 +27,6 @@ void append(void **array, size_t *size, size_t *capacity, size_t element_size, v
     (*size)++;
 }
  
-
-void ShowPopup(const char* message, const char* title) { MessageBox(NULL, message, title, MB_OK | MB_ICONINFORMATION); }
  /**************************
  * Function deltatime
  *
@@ -69,10 +72,11 @@ int nthpolygen(double radius, double n, double** xpoints, double** ypoints){
 	int i;
 	double centerX = 0.0, centerY = 0.0;
     double rotation = 0.0;
-	for(i=0; i<=n; i++){
+	for(i=0; i<=n-1; i++){
 		double angle = (2.0 * PI * i / n);
-		*ypoints[i] = radius*sin(angle);
-		*xpoints[i] = radius*cos(angle);
+		(*xpoints)[i] = radius * cos(angle);
+		(*ypoints)[i] = radius * sin(angle);
+
 	}
 }
 
@@ -164,43 +168,22 @@ struct totalspirals{
 	struct mainspiralset sfloor;
 	struct Spiral sfloors;
 };
-void initMainspiralset(struct mainspiralset* obj, int size, int zeta) {
+void initMainspiralset(struct mainspiralset* obj, int size, int zeta) {  //alloc array thing 
     obj->size = size;
     obj->zeta=zeta;
-    obj->Xs = (double*)malloc(size * sizeof(double));
-    obj->Ys = (double*)malloc(size * sizeof(double));
+    obj->Xs = (double*)calloc(size, sizeof(double));
+    obj->Ys = (double*)calloc(size, sizeof(double));
     
-    obj->complexxs = (double*)malloc(zeta* size * sizeof(double));
-    obj->complexys = (double*)malloc(zeta* size * sizeof(double));
+    obj->complexxs = (double*)calloc(zeta* size,sizeof(double));
+    obj->complexys = (double*)calloc(zeta* size,sizeof(double));
     
-    obj->colourr = (double**)malloc(zeta* size * sizeof(double));
-    obj->colourg = (double**)malloc(zeta* size * sizeof(double));
-    obj->colourb = (double**)malloc(zeta* size * sizeof(double));
-    obj->colourbb = (double**)malloc(zeta* size * sizeof(double));
+    obj->colourr = (double**)calloc(zeta* size ,sizeof(double));
+    obj->colourg = (double**)calloc(zeta* size ,sizeof(double));
+    obj->colourb = (double**)calloc(zeta* size ,sizeof(double));
+    obj->colourbb = (double**)calloc(zeta* size, sizeof(double));     //probs not needed
 }
 
-void copyMainspiralset(struct mainspiralset *dest, struct mainspiralset *src) {
-    dest->size = src->size;
-    dest->zeta = src->zeta;
 
-    dest->Xs = (double*)malloc(src->size * sizeof(double));
-    dest->Ys = (double*)malloc(src->size * sizeof(double));
-    dest->complexxs = (double*)malloc(src->zeta * src->size * sizeof(double));
-    dest->complexys = (double*)malloc(src->zeta * src->size * sizeof(double));
-    dest->colourr = (double**)malloc(src->zeta * src->size * sizeof(double *));
-    dest->colourg = (double**)malloc(src->zeta * src->size * sizeof(double*));
-    dest->colourb = (double**)malloc(src->zeta * src->size * sizeof(double*));
-    dest->colourbb = (double**)malloc(src->zeta * src->size * sizeof(double*));
-
-    if (dest->Xs) memcpy(dest->Xs, src->Xs, src->size * sizeof(double));
-    if (dest->Ys) memcpy(dest->Ys, src->Ys, src->size * sizeof(double));
-    if (dest->complexxs) memcpy(dest->complexxs, src->complexxs, src->zeta * src->size * sizeof(double));
-    if (dest->complexys) memcpy(dest->complexys, src->complexys, src->zeta * src->size * sizeof(double));
-    if (dest->colourr) memcpy(dest->colourr, src->colourr, src->zeta * src->size * sizeof(double*));
-    if (dest->colourg) memcpy(dest->colourg, src->colourg, src->zeta * src->size * sizeof(double*));
-    if (dest->colourb) memcpy(dest->colourb, src->colourb, src->zeta * src->size * sizeof(double*));
-    if (dest->colourbb) memcpy(dest->colourbb, src->colourbb, src->zeta * src->size * sizeof(double*));
-}
 
 void freeMainspiralset(struct mainspiralset *obj) {
     free(obj->Xs);
@@ -269,6 +252,7 @@ int render3dgraphicSPIRALComplexPlain(double* xs, int sizeofxs, double* ys,
     return 0;
 }
 #define DBL_MAX 0.1
+#define MaxMinDistance 1
 int findclosetcoordinate(double *inputx, double *inputy, int size, double findx, double findy, int *index) {
     if (size <= 0 || inputx == NULL || inputy == NULL || index == NULL) {
         return -1; // error: bad input
@@ -281,14 +265,10 @@ int findclosetcoordinate(double *inputx, double *inputy, int size, double findx,
     double dist;
     double dx;
     double dy;
-	for (i = 0; i < size; i++) {
-		if((inputx[i])>1 && (inputy[i])>1){
-			
-		}else{
-			dx = inputx[i] - findx;
-	    	dy = inputy[i] - findy;
-	    	dist = (dx+dy) *0.5;
-		}
+	for (i = 0; i < size && dist<(MaxMinDistance+(log(i))); i++) {
+		dx = inputx[i] - findx;
+		dy = inputy[i] - findy;
+		dist = (dx+dy) *0.5;
 	    if (dist < minDistance) {
 	        minDistance = dist;
 	        indexOfSmallest = i;
@@ -609,6 +589,7 @@ void renderassetoverlay(){
 void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct totalassets *totalass, struct totalspirals *allspirals){
 	//ok first we need to look at objects dimensions by creating a contour thiga maggig and loaded in the object into VDA, saving the countors
 	//then we convert everything to pollar coordinates, all seems shrinple
+	//debug ig 
 	int i;
 	char appendixvaribles[sizeof(assetsloaded)] = "";
 	for(i=0; i<sizeof(assetsloaded)-1; i++){
@@ -624,14 +605,16 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 				
 				//generating pentigon
 				int n = allspirals->sfloor.zeta;
-				double pointsx[n];
-				double pointsy[n];
+				double *pointsx = (double*)calloc(n, sizeof(double));
+				double *pointsy = (double*)calloc(n, sizeof(double));
 				int k;
 				int pindex[n];
 				int r=0;
 				int feta=0;
 				int zeta = 0;
-				nthpolygen(totalass->floor.weight,n,(double**)pointsx, (double**)pointsy);
+				ShowPopup("width below 0", "insfombia error cause yes!");
+				nthpolygen(totalass->floor.weight,n,&pointsx, &pointsy);
+				ShowPopup("width below 1", "insfombia error cause yes!");
 				for(k=0; k<=n; k++){
 					findclosetcoordinate(
 					    allspirals->sfloor.complexxs,
@@ -641,12 +624,15 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 					    pointsy[n],
 					    &pindex[n]
 					);                    // ok so round and the eq is r=sqr(x^2 +y2), feta = tan-1(y/x), z=z
+					ShowPopup("width below 2", "insfombia error cause yes!");
 					r=(int)pow(pow(totalass->floor.relativecoordinates[0]+allspirals->sfloor.complexxs[pindex[n] ],2)+pow(totalass->floor.relativecoordinates[1]+allspirals->sfloor.complexxs[pindex[n] ],2),0.5);
 					feta=(int)atan((totalass->floor.relativecoordinates[0]+allspirals->sfloor.complexxs[pindex[n] ])/ (totalass->floor.relativecoordinates[1]+allspirals->sfloor.complexxs[pindex[n] ]));
 					zeta = (int)(totalass->floor.relativecoordinates[2]);
+					ShowPopup("width below 3", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.boolstuffexr, &VDA->ww1.xrs, &VDA->ww1.xrc, sizeof(int), &r);
 					size_t n = VDA->ww1.xrs - 1;
 					double temp;
+					ShowPopup("width below 4", "insfombia error cause yes!");
 					temp = FLOORO;
 					append((void **)&VDA->ww1.boolstuffexrf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(double), &temp);
 					temp = feta;
@@ -658,6 +644,7 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 					temp = FLOORO;
 					append((void **)&VDA->ww1.boolstuffexzetaf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(double), &temp);
 					append((void **)&VDA->ww1.localindexxs, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &k);
+					ShowPopup("width below 4", "insfombia error cause yes!");                //crash between 3 and four for obvous reasons
 				}
 				//rotate thing once or not at all just go through all and make knew really quickly how about threads 
 				//now apply the spiral alg to the points to see how changed

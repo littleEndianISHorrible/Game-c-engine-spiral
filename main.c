@@ -109,21 +109,16 @@ int objectTospiralCoordinates(struct object *ob1, struct mainspiralset *object, 
     //here fill stuff in and tweek coordinates to the one that is generated in form loop
     int i;
     int pindex;
+    //instead of find we use math to locate the nearest equivilant by getting stuff nah
     for(i=0; i<size -1 ; i++){
     	//ok we got it, make a dictionary from the coordinates and find the matching on without c++ headrs :<
     	//cords ob1->vectorisedmodel[i][0] -2 -3 
     	int ret =0;
-    	if(i< size){
-    		ret = findclosetcoordinate(*acomplexx, *acomplexy, object->size*object->zeta, ob1->vectorisedmodel[i][0], ob1->vectorisedmodel[i][1], &pindex);
-		}
+    	ret = findclosetcoordinate(*acomplexx, *acomplexy, object->size*object->zeta, ob1->vectorisedmodel[i][0], ob1->vectorisedmodel[i][1], &pindex);
     	if(ret == -1){
     		ShowPopup(":< 14234 debug", "insfombia error cause yes!");
     		break;
-		}else if(ret != 0 && ret != -1){
-			//ShowPopup(":< 1wq4234 debug", "insfombia error cause yes!");
-    		break;
-		}
-		if(pindex >= (object->size)*object->zeta && pindex < 0){
+		}else if(pindex >= (object->size)*object->zeta && pindex < 0){
 			pindex=0;
 			ShowPopup("pindex out of range", "insfombia error cause yes!");
 		}
@@ -349,9 +344,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         	//update deltatime
         	playerkeys();
         	deltatime = clock() - deltatime;
-        	if(deltatime*1000 < 60 && deltatime*1000 != 60){
-        		//Sleep((60-deltatime*1000)/1000);
-			}
+//        	if(deltatime*1000 < 60 && deltatime*1000 != 60){
+//        		//Sleep((60-deltatime*1000)/1000);
+//			}                   no cap for now
         	//render
             objectrenderingEngine(maxsize, hDC, theta, &main, &mains, &totalass, &allspirals, &VDA);
             SwapBuffers(hDC);
