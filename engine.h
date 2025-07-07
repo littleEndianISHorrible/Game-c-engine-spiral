@@ -643,6 +643,7 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 				ShowPopup("width below 0", "insfombia error cause yes!");
 				nthpolygen(totalass->floor.weight,n,&pointsx, &pointsy);
 				ShowPopup("width below 1", "insfombia error cause yes!");
+				int buffer1, buffer2; 
 				for(k=0; k<=n; k++){
 					findclosetcoordinate(
 					    allspirals->sfloor.complexxs,
@@ -657,40 +658,42 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 					feta=(int)atan((totalass->floor.relativecoordinates[0]+allspirals->sfloor.complexxs[pindex[n] ])/ (totalass->floor.relativecoordinates[1]+allspirals->sfloor.complexxs[pindex[n] ]));
 					zeta = (int)(totalass->floor.relativecoordinates[2]);
 					ShowPopup("width below 3", "insfombia error cause yes!");
+					buffer1 = VDA->ww1.xrs;
+					buffer2 = VDA->ww1.xrc;
 					append((void **)&VDA->ww1.boolstuffexr, &VDA->ww1.xrs, &VDA->ww1.xrc, sizeof(int), &r);
 					size_t n = VDA->ww1.xrs - 1;
-					VDA->ww1.xrs--;
-					VDA->ww1.xrc--;
+					VDA->ww1.xrs= buffer1;
+					VDA->ww1.xrc= buffer2;
 					double temp;
 					ShowPopup("width below 4", "insfombia error cause yes!");
 					temp = FLOORO;
 					append((void **)&VDA->ww1.boolstuffexrf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &temp);
-					VDA->ww1.xrfs--;
-					VDA->ww1.xrfc--;
+					VDA->ww1.xrfs= buffer1;
+					VDA->ww1.xrfc= buffer2;
 					temp = feta;
 					ShowPopup("width below 41", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.boolstuffexfeta, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(double), &temp);
 					temp = FLOORO;
-					VDA->ww1.xrfs--;
-					VDA->ww1.xrfc--;
+					VDA->ww1.xrfs= buffer1;
+					VDA->ww1.xrfc= buffer2;
 					ShowPopup("width below 42", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.boolstuffexfetaf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &temp);
 					temp = zeta;
-					VDA->ww1.xrfs--;
-					VDA->ww1.xrfc--;
+					VDA->ww1.xrfs= buffer1;
+					VDA->ww1.xrfc= buffer2;
 					ShowPopup("width below 43", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.boolstuffexzeta, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(double), &temp);
 					temp = FLOORO;
-					VDA->ww1.xrfs--;
-					VDA->ww1.xrfc--;
+					VDA->ww1.xrfs= buffer1;
+					VDA->ww1.xrfc= buffer2;
 					ShowPopup("width below 44", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.boolstuffexzetaf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &temp);
-					VDA->ww1.xrfs--;
-					VDA->ww1.xrfc--;
+					VDA->ww1.xrfs= buffer1;
+					VDA->ww1.xrfc= buffer2;
 					ShowPopup("width below 45", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.localindexxs, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &k);
-					VDA->ww1.xrfs--;
-					VDA->ww1.xrfc--;
+					VDA->ww1.xrfs= buffer1;
+					VDA->ww1.xrfc= buffer2;
 					ShowPopup("width below 46", "insfombia error cause yes!");                //crash between 3 and four for obvous reasons
 				}
 				//rotate thing once or not at all just go through all and make knew really quickly how about threads 
