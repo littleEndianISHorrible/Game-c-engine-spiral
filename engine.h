@@ -13,19 +13,32 @@
 void ShowPopup(const char* message, const char* title) { MessageBox(NULL, message, title, MB_OK | MB_ICONINFORMATION); }
 
 void append(void **array, size_t *size, size_t *capacity, size_t element_size, void *value) {
-    if (*size >= *capacity) {
-        *capacity = (*capacity == 0) ? 4 : (*capacity * 2);
-        void *new_array = realloc(*array, *capacity * element_size);
+	ShowPopup("width below 333", "insfombia error cause yes!");
+        if (*size >= *capacity) {
+        size_t new_capacity = (*capacity == 0) ? 4 : (*capacity * 2);
+        void *new_array = malloc(new_capacity * element_size);
         if (!new_array) {
-        	ShowPopup("width below 333", "insfombia error cause yes!");
-            fprintf(stderr, "Memory allocation failed\n");
-            exit(1);
+            fprintf(stderr, "Manual allocation failed\n");
+            exit(EXIT_FAILURE);
         }
+
+        // Copy old data to new array
+        if (*array) {
+            memcpy(new_array, *array, (*size) * element_size);
+            free(*array);
+        }
+
         *array = new_array;
+        *capacity = new_capacity;
     }
+
+    ShowPopup("width below 515333", "insfombia error cause yes!");
     memcpy((char *)(*array) + (*size * element_size), value, element_size);
+    ShowPopup("width below 555333", "insfombia error cause yes!");
     (*size)++;
 }
+
+
  
  /**************************
  * Function deltatime
@@ -592,12 +605,27 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 	//debug ig 
 	int i;
 	char appendixvaribles[sizeof(assetsloaded)] = "";
+	// Ensure all size and capacity counters are initialized
+	if (VDA->ww1.xrs == 0 && VDA->ww1.xrc == 0 &&
+	    VDA->ww1.xrfs == 0 && VDA->ww1.xrfc == 0) {
+	    VDA->ww1.xrs = 0;
+	    VDA->ww1.xrc = 0;
+	    VDA->ww1.xrfs = 0;
+	    VDA->ww1.xrfc = 0;
+	}         
+	VDA->ww1.boolstuffexr = NULL;
+	VDA->ww1.boolstuffexrf = NULL;
+	VDA->ww1.boolstuffexfeta = NULL;
+	VDA->ww1.boolstuffexfetaf = NULL;
+	VDA->ww1.boolstuffexzeta = NULL;
+	VDA->ww1.boolstuffexzetaf = NULL;
+	VDA->ww1.localindexxs = NULL;
 	for(i=0; i<sizeof(assetsloaded)-1; i++){
 		switch (assetsloaded[i]){
 			case (char)VOIDO:
 				appendixvaribles[i] = (char)VOIDO;
 				//do stuff
-			case (char)FLOORO:
+			case (char)FLOORO:                  //make into a function
 				appendixvaribles[i] = (char)FLOORO;
 				//generate a circle of diameter floor bigger and then do findclosetcoordinate for like a 5 points on that circle (pentigon)
 				//for each orientation apply the math for sqeezing vertial matrixies from first found edges through locating the most isolated values on the spiral
@@ -631,20 +659,39 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 					ShowPopup("width below 3", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.boolstuffexr, &VDA->ww1.xrs, &VDA->ww1.xrc, sizeof(int), &r);
 					size_t n = VDA->ww1.xrs - 1;
+					VDA->ww1.xrs--;
+					VDA->ww1.xrc--;
 					double temp;
 					ShowPopup("width below 4", "insfombia error cause yes!");
 					temp = FLOORO;
-					append((void **)&VDA->ww1.boolstuffexrf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(double), &temp);
+					append((void **)&VDA->ww1.boolstuffexrf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &temp);
+					VDA->ww1.xrfs--;
+					VDA->ww1.xrfc--;
 					temp = feta;
+					ShowPopup("width below 41", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.boolstuffexfeta, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(double), &temp);
 					temp = FLOORO;
-					append((void **)&VDA->ww1.boolstuffexfetaf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(double), &temp);
+					VDA->ww1.xrfs--;
+					VDA->ww1.xrfc--;
+					ShowPopup("width below 42", "insfombia error cause yes!");
+					append((void **)&VDA->ww1.boolstuffexfetaf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &temp);
 					temp = zeta;
+					VDA->ww1.xrfs--;
+					VDA->ww1.xrfc--;
+					ShowPopup("width below 43", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.boolstuffexzeta, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(double), &temp);
 					temp = FLOORO;
-					append((void **)&VDA->ww1.boolstuffexzetaf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(double), &temp);
+					VDA->ww1.xrfs--;
+					VDA->ww1.xrfc--;
+					ShowPopup("width below 44", "insfombia error cause yes!");
+					append((void **)&VDA->ww1.boolstuffexzetaf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &temp);
+					VDA->ww1.xrfs--;
+					VDA->ww1.xrfc--;
+					ShowPopup("width below 45", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.localindexxs, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &k);
-					ShowPopup("width below 4", "insfombia error cause yes!");                //crash between 3 and four for obvous reasons
+					VDA->ww1.xrfs--;
+					VDA->ww1.xrfc--;
+					ShowPopup("width below 46", "insfombia error cause yes!");                //crash between 3 and four for obvous reasons
 				}
 				//rotate thing once or not at all just go through all and make knew really quickly how about threads 
 				//now apply the spiral alg to the points to see how changed
