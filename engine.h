@@ -13,7 +13,7 @@
 void ShowPopup(const char* message, const char* title) { MessageBox(NULL, message, title, MB_OK | MB_ICONINFORMATION); }
 
 void append(void **array, size_t *size, size_t *capacity, size_t element_size, void *value) {
-	ShowPopup("width below 333", "insfombia error cause yes!");
+	//ShowPopup("width below 333", "insfombia error cause yes!");
         if (*size >= *capacity) {
         size_t new_capacity = (*capacity == 0) ? 4 : (*capacity * 2);
         void *new_array = malloc(new_capacity * element_size);
@@ -32,9 +32,9 @@ void append(void **array, size_t *size, size_t *capacity, size_t element_size, v
         *capacity = new_capacity;
     }
 
-    ShowPopup("width below 515333", "insfombia error cause yes!");
+    //ShowPopup("width below 515333", "insfombia error cause yes!");
     memcpy((char *)(*array) + (*size * element_size), value, element_size);
-    ShowPopup("width below 555333", "insfombia error cause yes!");
+    //ShowPopup("width below 555333", "insfombia error cause yes!");
     (*size)++;
 }
 
@@ -606,13 +606,11 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 	int i;
 	char appendixvaribles[sizeof(assetsloaded)] = "";
 	// Ensure all size and capacity counters are initialized
-	if (VDA->ww1.xrs == 0 && VDA->ww1.xrc == 0 &&
-	    VDA->ww1.xrfs == 0 && VDA->ww1.xrfc == 0) {
-	    VDA->ww1.xrs = 0;
-	    VDA->ww1.xrc = 0;
-	    VDA->ww1.xrfs = 0;
-	    VDA->ww1.xrfc = 0;
-	}         
+
+	VDA->ww1.xrs = 0;
+	VDA->ww1.xrc = 0;
+	VDA->ww1.xrfs = 0;
+	VDA->ww1.xrfc = 0;
 	VDA->ww1.boolstuffexr = NULL;
 	VDA->ww1.boolstuffexrf = NULL;
 	VDA->ww1.boolstuffexfeta = NULL;
@@ -637,11 +635,11 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 				double *pointsy = (double*)calloc(n, sizeof(double));
 				int k;
 				int pindex[n];
-				int r=0;
+				int r=totalass->floor.weight; //devide by zeta of main or the texture 
 				int feta=0;
 				int zeta = 0;
 				ShowPopup("width below 0", "insfombia error cause yes!");
-				nthpolygen(totalass->floor.weight,n,&pointsx, &pointsy);
+				nthpolygen(r,n,&pointsx, &pointsy);
 				ShowPopup("width below 1", "insfombia error cause yes!");
 				int buffer1, buffer2; 
 				for(k=0; k<=n; k++){
@@ -653,11 +651,11 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 					    pointsy[n],
 					    &pindex[n]
 					);                    // ok so round and the eq is r=sqr(x^2 +y2), feta = tan-1(y/x), z=z
-					ShowPopup("width below 2", "insfombia error cause yes!");
+					//ShowPopup("width below 2", "insfombia error cause yes!");
 					r=(int)pow(pow(totalass->floor.relativecoordinates[0]+allspirals->sfloor.complexxs[pindex[n] ],2)+pow(totalass->floor.relativecoordinates[1]+allspirals->sfloor.complexxs[pindex[n] ],2),0.5);
 					feta=(int)atan((totalass->floor.relativecoordinates[0]+allspirals->sfloor.complexxs[pindex[n] ])/ (totalass->floor.relativecoordinates[1]+allspirals->sfloor.complexxs[pindex[n] ]));
 					zeta = (int)(totalass->floor.relativecoordinates[2]);
-					ShowPopup("width below 3", "insfombia error cause yes!");
+					//ShowPopup("width below 3", "insfombia error cause yes!");
 					buffer1 = VDA->ww1.xrs;
 					buffer2 = VDA->ww1.xrc;
 					append((void **)&VDA->ww1.boolstuffexr, &VDA->ww1.xrs, &VDA->ww1.xrc, sizeof(int), &r);
@@ -665,36 +663,34 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 					VDA->ww1.xrs= buffer1;
 					VDA->ww1.xrc= buffer2;
 					double temp;
-					ShowPopup("width below 4", "insfombia error cause yes!");
+					//ShowPopup("width below 4", "insfombia error cause yes!");
 					temp = FLOORO;
 					append((void **)&VDA->ww1.boolstuffexrf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &temp);
 					VDA->ww1.xrfs= buffer1;
 					VDA->ww1.xrfc= buffer2;
 					temp = feta;
-					ShowPopup("width below 41", "insfombia error cause yes!");
+					//ShowPopup("width below 41", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.boolstuffexfeta, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(double), &temp);
 					temp = FLOORO;
 					VDA->ww1.xrfs= buffer1;
 					VDA->ww1.xrfc= buffer2;
-					ShowPopup("width below 42", "insfombia error cause yes!");
+					//ShowPopup("width below 42", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.boolstuffexfetaf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &temp);
 					temp = zeta;
 					VDA->ww1.xrfs= buffer1;
 					VDA->ww1.xrfc= buffer2;
-					ShowPopup("width below 43", "insfombia error cause yes!");
+					//ShowPopup("width below 43", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.boolstuffexzeta, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(double), &temp);
 					temp = FLOORO;
 					VDA->ww1.xrfs= buffer1;
 					VDA->ww1.xrfc= buffer2;
-					ShowPopup("width below 44", "insfombia error cause yes!");
+					//ShowPopup("width below 44", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.boolstuffexzetaf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &temp);
 					VDA->ww1.xrfs= buffer1;
 					VDA->ww1.xrfc= buffer2;
-					ShowPopup("width below 45", "insfombia error cause yes!");
+					//ShowPopup("width below 45", "insfombia error cause yes!");
 					append((void **)&VDA->ww1.localindexxs, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &k);
-					VDA->ww1.xrfs= buffer1;
-					VDA->ww1.xrfc= buffer2;
-					ShowPopup("width below 46", "insfombia error cause yes!");                //crash between 3 and four for obvous reasons
+					//ShowPopup("width below 46", "insfombia error cause yes!");                //crash between 3 and four for obvous reasons
 				}
 				//rotate thing once or not at all just go through all and make knew really quickly how about threads 
 				//now apply the spiral alg to the points to see how changed
@@ -712,7 +708,19 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 				xyzend[1] = -1;
 				xyzend[2] = +100;
 				spiralomnidirectionalcompute(&allspirals->sfloors, xyzstart, xyzend, 1);
-				nthpolygen(totalass->floor.weight,n,(double**)pointsx, (double**)pointsy);
+				nthpolygen(totalass->floor.weight,n,&pointsx, &pointsy);
+				VDA->ww1.zrs = 0;
+				VDA->ww1.zrc = 0;
+				VDA->ww1.zrfs = 0;
+				VDA->ww1.zrfc = 0;
+				VDA->ww1.boolstuffezr = NULL;
+				VDA->ww1.boolstuffezrf = NULL;
+				VDA->ww1.boolstuffezfeta = NULL;
+				VDA->ww1.boolstuffezfetaf = NULL;
+				VDA->ww1.boolstuffezzeta = NULL;
+				VDA->ww1.boolstuffezzetaf = NULL;
+				VDA->ww1.localindexzs = NULL;
+				ShowPopup("width below 555333", "insfombia error cause yes!");
 				for (k = 0; k <= n; k++) {
 					findclosetcoordinate(
 						allspirals->sfloor.complexxs,
@@ -733,21 +741,36 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 						(totalass->floor.relativecoordinates[1] + allspirals->sfloor.complexys[pindex[n]])
 					);
 					zeta = (int)(totalass->floor.relativecoordinates[2]);
+					buffer1 = VDA->ww1.zrs;
+					buffer2 = VDA->ww1.zrc;
 					append((void **)&VDA->ww1.boolstuffezr, &VDA->ww1.zrs, &VDA->ww1.zrc, sizeof(int), &r);
 					size_t idx = VDA->ww1.zrs - 1;
+					VDA->ww1.zrfs= buffer1;
+					VDA->ww1.zrfc= buffer2;
 					double temp;
 					temp = FLOORO;
-					append((void **)&VDA->ww1.boolstuffezrf, &VDA->ww1.zrfs, &VDA->ww1.zrfc, sizeof(double), &temp);
+					append((void **)&VDA->ww1.boolstuffezrf, &VDA->ww1.zrfs, &VDA->ww1.zrfc, sizeof(int), &temp);
 					temp = feta;
-					append((void **)&VDA->ww1.boolstuffezfeta, &VDA->ww1.zrfs, &VDA->ww1.zrfc, sizeof(double), &temp);
+					VDA->ww1.zrs= buffer1;
+					VDA->ww1.zrc= buffer2;
+					append((void **)&VDA->ww1.boolstuffezfeta, &VDA->ww1.zrs, &VDA->ww1.zrc, sizeof(double), &temp);//greate crash
 					temp = FLOORO;
-					append((void **)&VDA->ww1.boolstuffezfetaf, &VDA->ww1.zrfs, &VDA->ww1.zrfc, sizeof(double), &temp);
+					VDA->ww1.zrfs= buffer1;
+					VDA->ww1.zrfc= buffer2;
+					append((void **)&VDA->ww1.boolstuffezfetaf, &VDA->ww1.zrfs, &VDA->ww1.zrfc, sizeof(int), &temp);
 					temp = zeta;
-					append((void **)&VDA->ww1.boolstuffezzeta, &VDA->ww1.zrfs, &VDA->ww1.zrfc, sizeof(double), &temp);
+					VDA->ww1.zrs= buffer1;
+					VDA->ww1.zrc= buffer2;
+					append((void **)&VDA->ww1.boolstuffezzeta, &VDA->ww1.zrs, &VDA->ww1.zrc, sizeof(double), &temp);
 					temp = FLOORO;
-					append((void **)&VDA->ww1.boolstuffezzetaf, &VDA->ww1.zrfs, &VDA->ww1.zrfc, sizeof(double), &temp);
-					append((void **)&VDA->ww1.localindexzs, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &k);
+					VDA->ww1.zrfs= buffer1;
+					VDA->ww1.zrfc= buffer2;
+					append((void **)&VDA->ww1.boolstuffezzetaf, &VDA->ww1.zrfs, &VDA->ww1.zrfc, sizeof(int), &temp);
+					VDA->ww1.zrfs= buffer1;
+					VDA->ww1.zrfc= buffer2;
+					append((void **)&VDA->ww1.localindexzs, &VDA->ww1.zrfs, &VDA->ww1.zrfc, sizeof(int), &k);
 				}
+				ShowPopup("width below 1555333", "insfombia error cause yes!");
 		}
 	}
 }
@@ -790,9 +813,9 @@ void allobjectsrender(struct visibledomain *VDA, struct mainspiralset *main, str
 	 we also need the player coordinates and camera orination regarding this mess however that is the unit circle oritation scheme which is just multpling the base coordinates by and angle
 	 to get the requried position of shining things, light will copy this mechanic later so that only in certrain radius 
 	 */
-	 int TSOVIEW =  sizeof(VDA->ww1.boolstuffexrf);
+	 int TSOVIEW =  sizeof(VDA->ww1.boolstuffexrf)/sizeof(double);
 	 
-	int xri[TSOVIEW];
+	int *xri = calloc(TSOVIEW, sizeof(int));
 //	int xfetai[TSOVIEW];
 //	int xzetai[TSOVIEW];
 //	
@@ -811,11 +834,13 @@ void allobjectsrender(struct visibledomain *VDA, struct mainspiralset *main, str
 	float renderdistancescale=1;
 	int i;
 	int indexj =0;
+	ShowPopup("could not load fl33oor asset  rrr 2-4:<", "insfombia error cause yes!");
 	for(i=0; i<=TSOVIEW-1;i++){//ok so add if statements to make sure that in range 
 		if((VDA->ww1.boolstuffexfeta[i]>=dynamiccamerafeta&& VDA->ww1.boolstuffexzeta[i]>=dynamiccamerazeta) || (VDA->ww1.boolstuffexfeta[i]<= - dynamiccamerafeta&& VDA->ww1.boolstuffexzeta[i] <= -dynamiccamerazeta)){
 			//then ok and print
 			xri[indexj] = i;
 			indexj++;
+			ShowPopup("could not load fl33oor asset wr2r rrr 2-4:<", "insfombia error cause yes!");
 			//put onto main
 			//edit funny pixles   //finial stretch nearly to render your darn pixel
 		}
@@ -823,7 +848,9 @@ void allobjectsrender(struct visibledomain *VDA, struct mainspiralset *main, str
 	} //maybe maybe not
 	double scalex =1;
 	double scaley =1;
-	for(i=0; i<=sizeof(xri)/sizeof(int); i++){
+	int l =0; 
+	for(i=0; i<=sizeof(xri)/sizeof(int); i++){        //here is cancer
+        l = (int)VDA->ww1.boolstuffexrf[xri[i]];
 		switch((int)VDA->ww1.boolstuffexrf[xri[i]]){
 			case VOIDO:
 				//do nothing ignore
