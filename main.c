@@ -71,9 +71,11 @@ int maxSize, double theta, double relativer){ // fin for now
     		ShowPopup("pain", "pains");
 		}
 		if (main->colourr[i] == NULL || main->colourg[i] == NULL || main->colourb[i] == NULL) {
-		    glColor3f(0.0f, 0.0f, 0.0f);  // fail-safe black
+		    glColor3f(1.0f, 0.0f, 0.0f);  // fail-safe black
+		    //ShowPopup("pain blacky", "pains");
 		} else if (*(main->colourr[i]) == 0.0 && *(main->colourg[i]) == 0.0 && *(main->colourb[i]) == 0.0) {
-		    glColor3f(0.0f, 0.0f, 0.0f);  // still black
+		    glColor3f(0.0f, 1.0f, 0.0f);  // still black
+		    //ShowPopup("pain blacky2", "pains");
 		} else {
 		    glColor3f(*(main->colourr[i]), *(main->colourg[i]), *(main->colourb[i]));
 		}
@@ -105,6 +107,7 @@ int objectTospiralCoordinates(struct object *ob1, struct mainspiralset *object, 
 	double ** ays = &object->Ys;
 	double ** acomplexx = &object->complexxs;
 	double ** acomplexy = &object->complexys;
+	object->size = size;
     render3dgraphicSPIRALComplexPlain(*axs, object->size, *ays, 0, 0, object->zeta, *acomplexx, *acomplexy, *objects);
     //here fill stuff in and tweek coordinates to the one that is generated in form loop
     int i;
@@ -264,6 +267,7 @@ void objectrenderingEngine(int maxsize, HDC hDC, double theta, struct mainspiral
 	if(deltatime*1000 > 120){
 		//skip process frames compute physics and camera changes with input 
 		Sleep(10); //for now
+		ShowPopup("ntr he engine just could't render stuff correctly which means alot more bugs exists which i though i fixed'", "insfombia error cause yes!");
 	}else{
 		//recompute the thing withoutphysics and render 
 		int ret = configuresingularobjects(totalass, main, firstload, allspirals, VDA);
@@ -308,7 +312,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
     /* create main window */
-    int maxsize = 500;
+    int maxsize = 1000;
     struct mainspiralset main;
     struct Spiral mains;
     struct totalassets totalass;

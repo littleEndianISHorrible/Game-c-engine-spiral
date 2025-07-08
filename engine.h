@@ -266,6 +266,7 @@ int render3dgraphicSPIRALComplexPlain(double* xs, int sizeofxs, double* ys,
 }
 #define DBL_MAX 0.1
 #define MaxMinDistance 1
+#define Devisitor 20
 int findclosetcoordinate(double *inputx, double *inputy, int size, double findx, double findy, int *index) {
     if (size <= 0 || inputx == NULL || inputy == NULL || index == NULL) {
         return -1; // error: bad input
@@ -282,7 +283,7 @@ int findclosetcoordinate(double *inputx, double *inputy, int size, double findx,
 		dx = inputx[i] - findx;
 		dy = inputy[i] - findy;
 		dist = (dx+dy) *0.5;
-	    if (dist < minDistance) {
+	    if (dist < (minDistance/Devisitor)) {
 	        minDistance = dist;
 	        indexOfSmallest = i;
 	    }
@@ -635,26 +636,27 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 				double *pointsy = (double*)calloc(n, sizeof(double));
 				int k;
 				int pindex[n];
-				int r=totalass->floor.weight; //devide by zeta of main or the texture 
-				int feta=0;
-				int zeta = 0;
+				double r=totalass->floor.weight / n; //devide by zeta of main or the texture 
+				double feta=0;
+				double zeta = 0;
 				ShowPopup("width below 0", "insfombia error cause yes!");
 				nthpolygen(r,n,&pointsx, &pointsy);
 				ShowPopup("width below 1", "insfombia error cause yes!");
 				int buffer1, buffer2; 
+				r=0.00;                                             //;< huh
 				for(k=0; k<=n; k++){
 					findclosetcoordinate(
 					    allspirals->sfloor.complexxs,
 					    allspirals->sfloor.complexys,
-					    allspirals->sfloor.totalsize,
+					    allspirals->sfloor.totalsize,  //total size is zero
 					    pointsx[n],
 					    pointsy[n],
 					    &pindex[n]
 					);                    // ok so round and the eq is r=sqr(x^2 +y2), feta = tan-1(y/x), z=z
 					//ShowPopup("width below 2", "insfombia error cause yes!");
-					r=(int)pow(pow(totalass->floor.relativecoordinates[0]+allspirals->sfloor.complexxs[pindex[n] ],2)+pow(totalass->floor.relativecoordinates[1]+allspirals->sfloor.complexxs[pindex[n] ],2),0.5);
-					feta=(int)atan((totalass->floor.relativecoordinates[0]+allspirals->sfloor.complexxs[pindex[n] ])/ (totalass->floor.relativecoordinates[1]+allspirals->sfloor.complexxs[pindex[n] ]));
-					zeta = (int)(totalass->floor.relativecoordinates[2]);
+					r=pow(pow(totalass->floor.relativecoordinates[0]+allspirals->sfloor.complexxs[pindex[n] ],2)+pow(totalass->floor.relativecoordinates[1]+allspirals->sfloor.complexxs[pindex[n] ],2),0.5);//also zero 
+					feta=atan((totalass->floor.relativecoordinates[0]+allspirals->sfloor.complexxs[pindex[n] ])/ (totalass->floor.relativecoordinates[1]+allspirals->sfloor.complexxs[pindex[n] ]));   //feta zero
+					zeta = (totalass->floor.relativecoordinates[2]);   //also zero
 					//ShowPopup("width below 3", "insfombia error cause yes!");
 					buffer1 = VDA->ww1.xrs;
 					buffer2 = VDA->ww1.xrc;
@@ -731,16 +733,16 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 						&pindex[n]
 					);
 					// Compute cylindrical coordinates
-					r = (int)pow(
+					r = pow(
 						pow(totalass->floor.relativecoordinates[0] + allspirals->sfloor.complexxs[pindex[n]], 2) +
 						pow(totalass->floor.relativecoordinates[1] + allspirals->sfloor.complexys[pindex[n]], 2),
 						0.5
 					);
-					feta = (int)atan(
+					feta = atan(
 						(totalass->floor.relativecoordinates[0] + allspirals->sfloor.complexxs[pindex[n]]) /
 						(totalass->floor.relativecoordinates[1] + allspirals->sfloor.complexys[pindex[n]])
 					);
-					zeta = (int)(totalass->floor.relativecoordinates[2]);
+					zeta = (totalass->floor.relativecoordinates[2]);
 					buffer1 = VDA->ww1.zrs;
 					buffer2 = VDA->ww1.zrc;
 					append((void **)&VDA->ww1.boolstuffezr, &VDA->ww1.zrs, &VDA->ww1.zrc, sizeof(int), &r);
@@ -813,7 +815,7 @@ void allobjectsrender(struct visibledomain *VDA, struct mainspiralset *main, str
 	 we also need the player coordinates and camera orination regarding this mess however that is the unit circle oritation scheme which is just multpling the base coordinates by and angle
 	 to get the requried position of shining things, light will copy this mechanic later so that only in certrain radius 
 	 */
-	 int TSOVIEW =  sizeof(VDA->ww1.boolstuffexrf)/sizeof(double);
+	 int TSOVIEW =  sizeof(VDA->ww1.boolstuffexrf);
 	 
 	int *xri = calloc(TSOVIEW, sizeof(int));
 //	int xfetai[TSOVIEW];
@@ -835,7 +837,7 @@ void allobjectsrender(struct visibledomain *VDA, struct mainspiralset *main, str
 	int i;
 	int indexj =0;
 	ShowPopup("could not load fl33oor asset  rrr 2-4:<", "insfombia error cause yes!");
-	for(i=0; i<=TSOVIEW-1;i++){//ok so add if statements to make sure that in range 
+	for(i=0; i<=TSOVIEW;i++){//ok so add if statements to make sure that in range 
 		if((VDA->ww1.boolstuffexfeta[i]>=dynamiccamerafeta&& VDA->ww1.boolstuffexzeta[i]>=dynamiccamerazeta) || (VDA->ww1.boolstuffexfeta[i]<= - dynamiccamerafeta&& VDA->ww1.boolstuffexzeta[i] <= -dynamiccamerazeta)){
 			//then ok and print
 			xri[indexj] = i;
@@ -849,7 +851,8 @@ void allobjectsrender(struct visibledomain *VDA, struct mainspiralset *main, str
 	double scalex =1;
 	double scaley =1;
 	int l =0; 
-	for(i=0; i<=sizeof(xri)/sizeof(int); i++){        //here is cancer
+	int omega = sizeof(xri)/sizeof(int);;
+	for(i=0; i<=omega; i++){        //here is cancer
         l = (int)VDA->ww1.boolstuffexrf[xri[i]];
 		switch((int)VDA->ww1.boolstuffexrf[xri[i]]){
 			case VOIDO:
@@ -882,6 +885,9 @@ void allobjectsrender(struct visibledomain *VDA, struct mainspiralset *main, str
 				break;
 		}
 	}
+
+
+	ShowPopup("could not load fl33oor asset wr2r rrr 2-4:< wot", "insfombia error cause yes wot!");
 	//main compression function    ha ah ah h ha ha a add 
 
 	
