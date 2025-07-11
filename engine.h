@@ -170,10 +170,10 @@ struct mainspiralset{
     int totalsize;
     double *complexxs;
     double *complexys;
-    double **colourr;
-    double **colourg;
-    double **colourb;
-    double **colourbb;
+    double *colourr;
+    double *colourg;
+    double *colourb;
+    double *colourbb;
     //rgb
 };
 
@@ -190,10 +190,10 @@ void initMainspiralset(struct mainspiralset* obj, int size, int zeta) {  //alloc
     obj->complexxs = (double*)calloc(zeta* size,sizeof(double));
     obj->complexys = (double*)calloc(zeta* size,sizeof(double));
     
-    obj->colourr = (double**)calloc(zeta* size ,sizeof(double));
-    obj->colourg = (double**)calloc(zeta* size ,sizeof(double));
-    obj->colourb = (double**)calloc(zeta* size ,sizeof(double));
-    obj->colourbb = (double**)calloc(zeta* size, sizeof(double));     //probs not needed
+    obj->colourr = (double*)calloc(zeta* size ,sizeof(double));
+    obj->colourg = (double*)calloc(zeta* size ,sizeof(double));
+    obj->colourb = (double*)calloc(zeta* size ,sizeof(double));
+    obj->colourbb = (double*)calloc(zeta* size, sizeof(double));     //probs not needed
 }
 
 
@@ -204,12 +204,10 @@ void freeMainspiralset(struct mainspiralset *obj) {
     free(obj->complexxs);
     free(obj->complexys);
     int i;
-    for (i = 0; i < obj->size; i++) {
-	    free(obj->colourr[i]);
-	    free(obj->colourg[i]);
-	    free(obj->colourb[i]);
-	    free(obj->colourbb[i]);
-	}
+    free(obj->colourr);
+    free(obj->colourg);
+    free(obj->colourb);
+    free(obj->colourbb);
 	
 	free(obj->colourr);
 	free(obj->colourg);
@@ -265,34 +263,42 @@ int render3dgraphicSPIRALComplexPlain(double* xs, int sizeofxs, double* ys,
     return 0;
 }
 #define DBL_MAX 0.1
-#define MaxMinDistance 1
+#define MaxMinDistance 5
 #define Devisitor 20
+#define NOTDISTANCE 20
 int findclosetcoordinate(double *inputx, double *inputy, int size, double findx, double findy, int *index) {
     if (size <= 0 || inputx == NULL || inputy == NULL || index == NULL) {
         return -1; // error: bad input
     }
 
     double minDistance = DBL_MAX;
-	int indexOfSmallest = 0;
-	int  i;
-//ShowPopup(":< 14234qq debug", "insfombia error cause yes!");
-    double dist;
-    double dx;
-    double dy;
-	for (i = 0; i < size && dist<(MaxMinDistance+(log(i))); i++) {
-		dx = inputx[i] - findx;
-		dy = inputy[i] - findy;
-		dist = (dx+dy) *0.5;
-	    if (dist < (minDistance/Devisitor)) {
-	        minDistance = dist;
-	        indexOfSmallest = i;
-	    }
-	}
-	//ShowPopup(":< 14234qq debug", "insfombia error cause yes!");
-	*index = indexOfSmallest;
+    int indexOfSmallest = 0;
+    int i;
 
+    for (i = 0; i < size; i++) {
+        double dx = inputx[i] - findx;
+        double dy = inputy[i] - findy;
+        double dist = sqrt(dx * dx + dy * dy);  // Use proper Euclidean distance
+        if(dist>NOTDISTANCE){
+        	i=i+(int)(NOTDISTANCE/MaxMinDistance);
+		}else{
+			if (dist < minDistance) {
+	            minDistance = dist;
+	            indexOfSmallest = i;
+	        }
+	
+	        // Optional: break early if distance is "close enough"
+	        if (dist < (MaxMinDistance/Devisitor)+log(i)) {
+	        	indexOfSmallest = i;
+	            break;
+	        }
+		}
+    }
+	indexOfSmallest=0;
+    *index = indexOfSmallest;
     return 0;
 }
+
 struct Textures{
 	char * filepath; 
 	int height; 
@@ -583,8 +589,8 @@ int customeobjectfloor(struct totalassets *floor){
 		floor->floor.vectorisedmodel[i][0] = floor->floor.texture.texture3dArray[i][0];
 		floor->floor.vectorisedmodel[i][1] = floor->floor.texture.texture3dArray[i][1];
 		floor->floor.vectorisedmodel[i][2] = 0;          //how impliment now well tilt goes first i suppose
-		floor->floor.vectorisedmodel[i][3] = floor->floor.texture.texture3dArray[i][2];
-		floor->floor.vectorisedmodel[i][4] = floor->floor.texture.texture3dArray[i][3];
+		floor->floor.vectorisedmodel[i][3] = 1.0f; //floor->floor.texture.texture3dArray[i][2];
+		floor->floor.vectorisedmodel[i][4] = 1.0f;//floor->floor.texture.texture3dArray[i][3];
 		floor->floor.vectorisedmodel[i][5] = floor->floor.texture.texture3dArray[i][4];
 		//floor->floor.vectorisedmodel[i][6] = 0.0f;
 			

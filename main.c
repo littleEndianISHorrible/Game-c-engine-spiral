@@ -30,6 +30,7 @@ void setOrthoProjection(int width, int height)
     glLoadIdentity();
 }
 
+#define EPSILON 0.0001f
 int openGLplotSpiral(struct mainspiralset *main, 
 int length, HDC hDC, 
 int maxSize, double theta, double relativer){ // fin for now
@@ -40,12 +41,12 @@ int maxSize, double theta, double relativer){ // fin for now
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 1.0f, 0.0f, 0.40f);
     glClear(GL_COLOR_BUFFER_BIT);
     glBegin(GL_POINTS);
     int i;
     double list[2];
-    for(i = 0; i < length; i++) {
+    for(i = 0; i < length-1; i++) {
 //		long double XS = (main->complexxs[i]+ maxSize/2);
 //		long double YS = (main->complexys[i]+ maxSize/2);
 //        long double norm_x = (2.000 * XS / maxSize) - 1.0000;
@@ -70,19 +71,32 @@ int maxSize, double theta, double relativer){ // fin for now
     		printf("WARNING: Vertex out of bounds at index %d: (%f, %f)\n", i, norm_x, norm_y);
     		ShowPopup("pain", "pains");
 		}
-		if (main->colourr[i] == NULL || main->colourg[i] == NULL || main->colourb[i] == NULL) {
-		    glColor3f(1.0f, 0.0f, 0.0f);  // fail-safe black
-		    //ShowPopup("pain blacky", "pains");
-		} else if (*(main->colourr[i]) == 0.0 && *(main->colourg[i]) == 0.0 && *(main->colourb[i]) == 0.0) {
-		    glColor3f(0.0f, 1.0f, 0.0f);  // still black
-		    //ShowPopup("pain blacky2", "pains");
+		//glColor3f((float)main->colourr[i]-0.01f, (float)main->colourg[i], (float)main->colourb[i]);
+		//glColor3f(*(main->colourr[i]), *(main->colourg[i]), *(main->colourb[i]));
+		//glColor3f(0.0f, 0.0f, 1.0f);
+		if ((fabs(main->colourr[i]) > EPSILON) ||
+		    (fabs(main->colourg[i]) > EPSILON) ||
+		    (fabs(main->colourb[i]) > EPSILON)) {
+		    glColor3f(main->colourr[i], main->colourg[i], main->colourb[i]);
 		} else {
-		    glColor3f(*(main->colourr[i]), *(main->colourg[i]), *(main->colourb[i]));
+		    glColor3f(1.0f, 0.0f, 0.0f);
 		}
+		//glColor3f(main->colourr[i], main->colourg[i], main->colourb[i]);   weird bug
+		//printing the three
+		char buffer[200];
+		sprintf(buffer, "red, green, blue %lf, %.2f, %.2f", main->colourr[i], main->colourg[i], main->colourb[i]);
+		//ShowPopup(buffer, "200");
+		///glColor3f((main->colourr[i]), (main->colourg[i]), (main->colourb[i]));
+		//glColor3f(*(main->colourr[i]), *(main->colourg[i]), *(main->colourb[i]));
+		
+		
 
         glVertex2f(norm_x, norm_y);
     }
     glEnd();
+    
+// Then hard-coded red
+
     SwapBuffers(hDC);
     return 0;
 }
@@ -112,6 +126,8 @@ int objectTospiralCoordinates(struct object *ob1, struct mainspiralset *object, 
     //here fill stuff in and tweek coordinates to the one that is generated in form loop
     int i;
     int pindex;
+    float red, green, blue;
+    double megnta;
     //instead of find we use math to locate the nearest equivilant by getting stuff nah
     for(i=0; i<size -1 ; i++){
     	//ok we got it, make a dictionary from the coordinates and find the matching on without c++ headrs :<
@@ -121,15 +137,20 @@ int objectTospiralCoordinates(struct object *ob1, struct mainspiralset *object, 
     	if(ret == -1){
     		ShowPopup(":< 14234 debug", "insfombia error cause yes!");
     		break;
-		}else if(pindex >= (object->size)*object->zeta && pindex < 0){
-			pindex=0;
-			ShowPopup("pindex out of range", "insfombia error cause yes!");
+		}else if (pindex <= 0 || pindex >= object->size * object->zeta) {
+		    //ShowPopup("pindex out of range", "insfombia error cause yes!");
+		    pindex = i; // fallback
 		}
+
+		int c = 20;
+		red = ob1->vectorisedmodel[i][3];
+		green = ob1->vectorisedmodel[i][4];
+		blue = ob1->vectorisedmodel[i][5]; //devide by 255
+		object->colourr[pindex] = (float)((red+c) / 255.0);
+		object->colourg[pindex] = (float)((green+c)/ 255.0);
+		object->colourb[pindex] = (float)((blue+c) / 255.0);
 		
-    	object->colourr[pindex] = &ob1->vectorisedmodel[i][3];  // Assign pointer to red
-		object->colourg[pindex] = &ob1->vectorisedmodel[i][4];  // Assign pointer to green
-		object->colourb[pindex] = &ob1->vectorisedmodel[i][5];  // Assign pointer to blue
-		object->colourbb[pindex] = &ob1->vectorisedmodel[i][6]; // Assign pointer to another color component (e.g., alpha)
+																	   //test this block of code by  sneding to main spiral set th
 
     	//Sleep(100);
     	//free(ob1->vectorisedmodel[i]);
@@ -143,7 +164,7 @@ int objectTospiralCoordinates(struct object *ob1, struct mainspiralset *object, 
     //first using bool operator  than using a mask
 }
 int configuresingularobjects(struct totalassets *totalass, struct mainspiralset *main, bool firstload, struct totalspirals *allspirals, struct visibledomain *VDA){
-	ShowPopup("could not load fl33oor asset rrr -2 :<", "insfombia error cause yes!");
+	//ShowPopup("could not load fl33oor asset rrr -2 :<", "insfombia error cause yes!");
 	if(firstload){
 		char totalobjectsloaded[1] = ""; //add more to the thing index
 		int ret = customeobjectfloor(totalass);
@@ -158,12 +179,14 @@ int configuresingularobjects(struct totalassets *totalass, struct mainspiralset 
 		//+ other objects
 		//ShowPopup("could not load floor asset :<", "insfombia error cause yes!");
 		//render said objects
+		//fisrt of all loop but that for future me problem 
 		if(totalobjectsloaded[0] == 'F'){
 			allspirals->sfloors.definefirst = true;
 			//compute vector smoosh factors based on position needed
-			ShowPopup("could not load fl33oor asset rrr -1 :<", "insfombia error cause yes!");
-			int ret2 = objectTospiralCoordinates(&totalass->floor, &allspirals->sfloor, &allspirals->sfloors);
-			ShowPopup("could not load fl33oor asset rrr 0 :<", "insfombia error cause yes!");
+			//ShowPopup("could not load fl33oor asset rrr -1 :<", "insfombia error cause yes!");
+			//int ret2 = objectTospiralCoordinates(&totalass->floor, &allspirals->sfloor, &allspirals->sfloors);
+			int ret2 = objectTospiralCoordinates(&totalass->floor, main, &allspirals->sfloors);
+			//ShowPopup("could not load fl33oor asset rrr 0 :<", "insfombia error cause yes!");
 			if(ret2 == 1 || ret2 == -1){
 				exit(-1);
 			}
@@ -180,10 +203,29 @@ int configuresingularobjects(struct totalassets *totalass, struct mainspiralset 
 				//load other ++
 				1+1;
 		}
+		//hyjack main test with flooor
+		
+//		main->complexxs = allspirals->sfloor.complexxs;
+//		main->complexys = allspirals->sfloor.complexys;
+//		
+//		*main->colourr = *allspirals->sfloor.colourr;
+//		*main->colourg = *allspirals->sfloor.colourg;
+//		*main->colourb = *allspirals->sfloor.colourb;
+//		
+//		memcpy(main->complexxs, allspirals->sfloor.complexxs, allspirals->sfloor.totalsize* sizeof(double));
+//		memcpy(main->complexys, allspirals->sfloor.complexys, allspirals->sfloor.totalsize* sizeof(double));
+//		
+//		
+//		memcpy(*main->colourr, *allspirals->sfloor.colourr,allspirals->sfloor.totalsize* sizeof(double));
+//		memcpy(*main->colourb, *allspirals->sfloor.colourb,allspirals->sfloor.totalsize* sizeof(double));
+//		memcpy(*main->colourg, *allspirals->sfloor.colourg,allspirals->sfloor.totalsize* sizeof(double));
+		
+		//do this memcpy(list1, list2, 50 * sizeof(double));
+		
 		ShowPopup("could not load fl33oor asset rrr 1 :<", "insfombia error cause yes!");
-		getcorrdsTerrian(totalobjectsloaded,VDA, totalass, allspirals);
+		//getcorrdsTerrian(totalobjectsloaded,VDA, totalass, allspirals);
 		ShowPopup("could not load fl33oor asset  rrr 2:<", "insfombia error cause yes!");
-		allobjectsrender(VDA,main, allspirals);
+		//allobjectsrender(VDA,main, allspirals);
 		ShowPopup("could not load fl33oor asset rrr 3 start render:<", "insfombia error cause yes!");
 		//compute camera
 		
@@ -244,7 +286,7 @@ void firstload(struct mainspiralset *main, struct Spiral *mains, int sizex, int 
 	double ** ays = &main->Ys;
 	double ** acomplexx = &main->complexxs;
 	double ** acomplexy = &main->complexys;
-    render3dgraphicSPIRALComplexPlain(*axs, main->size, *ays, 0, 0, main->zeta, *acomplexx, *acomplexy, *mains);
+    //render3dgraphicSPIRALComplexPlain(*axs, main->size, *ays, 0, 0, main->zeta, *acomplexx, *acomplexy, *mains);
 	
 	//load textures
 	int ret = configuresingularobjects(totalass, main, true, allspirals, VDA);
@@ -348,6 +390,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         	//update deltatime
         	playerkeys();
         	deltatime = clock() - deltatime;
+        	openGLplotSpiral(&main, main.totalsize, hDC, maxsize, theta, 1);
 //        	if(deltatime*1000 < 60 && deltatime*1000 != 60){
 //        		//Sleep((60-deltatime*1000)/1000);
 //			}                   no cap for now
