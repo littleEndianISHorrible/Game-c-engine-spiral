@@ -62,41 +62,41 @@ clock_t deltatime;
 //d = partial derivative
 //s = ihat s(x,y,l,t) = ib*g(x,l)/bx + j*bg(y,t)/by ? */
 struct Spiral{
-	double j;
-	double i;
-	double l;
-	double p;
-	double a;
-	double t; 
-	double b;
+	float j;
+	float i;
+	float l;
+	float p;
+	float a;
+	float t; 
+	float b;
 	char baseEQ[100];
 	bool definefirst;
 };
-double AX(double x, struct Spiral i){return x*i.i;}
-double BX(double x, struct Spiral j){return x*j.j;}
-double* SpiralGenBASE(double a, double b, double l, double t, double x, double z, double w) {
-    static double buffer[2];  // Static keeps the variable alive beyond function scope
+float AX(float x, struct Spiral i){return x*i.i;}
+float BX(float x, struct Spiral j){return x*j.j;}
+float* SpiralGenBASE(float a, float b, float l, float t, float x, float z, float w) {
+    static float buffer[2];  // Static keeps the variable alive beyond function scope
     buffer[0] = tan(sin(x + l+ 1e-6)) * (a+ 1e-6)+z;
     buffer[1] = tan(cos(x + t+ 1e-6)) * (b+ 1e-6)+w;
     return buffer;
 }
 #define PI 3.141592653589793
-int nthpolygen(double radius, double n, double** xpoints, double** ypoints){
+int nthpolygen(float radius, float n, float** xpoints, float** ypoints){
 	int i;
-	double centerX = 0.0, centerY = 0.0;
-    double rotation = 0.0;
+	float centerX = 0.0, centerY = 0.0;
+    float rotation = 0.0;
 	for(i=0; i<=n-1; i++){
-		double angle = (2.0 * PI * i / n);
+		float angle = (2.0 * PI * i / n);
 		(*xpoints)[i] = radius * cos(angle);
 		(*ypoints)[i] = radius * sin(angle);
 
 	}
 }
 
-char* spiralvaluetoformular(double *x, double *y){
+char* spiralvaluetoformular(float *x, float *y){
 	return "he"; //return string. 
 }
-double findValue(char*stringEquation, char specificCharacter, double *pointerToVar){
+float findValue(char*stringEquation, char specificCharacter, float *pointerToVar){
 	int i; 
 	for(i=0; i<=sizeof(stringEquation); i++){
 		if(stringEquation[i] == specificCharacter && i!=sizeof(stringEquation)){
@@ -132,12 +132,32 @@ int reverseDigits(int num) {
     return isNegative ? -rev_num : rev_num;
 }
 
+/**************************
+ * animations      (Ihate them)
+ 
+ 
+ so, we have to import them or animate
+ them with physics like the colours,
+ 
+ 
+ ok so we make it so that joins are free mooving and 
+ the characters that have join objects mean that these object can tug stuff
+ but they are spirals 
+ 
+ so basiclly a water engine that behaves not like water 
+ *
+ **************************/
+ 
+ 
+/**************************
+ * spiral transformations
+ *
+ **************************/
 
-
-void spiralomnidirectionalcompute(struct Spiral *object, int *xyzvectora, int *xyzvectorb, double scale){            //x y z 1, x y z 2
-	double deltax = xyzvectorb[0] - xyzvectora[0];
-	double deltay = xyzvectorb[1] - xyzvectora[1];
-	double deltaz = xyzvectorb[2] - xyzvectora[2];
+void spiralomnidirectionalcompute(struct Spiral *object, int *xyzvectora, int *xyzvectorb, float scale){            //x y z 1, x y z 2
+	float deltax = xyzvectorb[0] - xyzvectora[0];
+	float deltay = xyzvectorb[1] - xyzvectora[1];
+	float deltaz = xyzvectorb[2] - xyzvectora[2];
 	
 	deltax = scale*deltax;
 	deltay = scale*deltay;
@@ -148,6 +168,10 @@ void spiralomnidirectionalcompute(struct Spiral *object, int *xyzvectora, int *x
 	object->l = object->l+(deltaz/deltay);
 }
 
+void scale(){
+}
+void rotate(){
+}
 /**************************
  * textures
  *
@@ -164,16 +188,17 @@ void spiralomnidirectionalcompute(struct Spiral *object, int *xyzvectora, int *x
 
 struct mainspiralset{
 	int size;
-	double *Xs;
-    double *Ys;
+	float *Xs;
+    float *Ys;
     int zeta;
     int totalsize;
-    double *complexxs;
-    double *complexys;
-    double *colourr;
-    double *colourg;
-    double *colourb;
-    double *colourbb;
+    float relitivescale;
+    float *complexxs;
+    float *complexys;
+    float *colourr;
+    float *colourg;
+    float *colourb;
+    float *colourbb;
     //rgb
 };
 
@@ -184,16 +209,16 @@ struct totalspirals{
 void initMainspiralset(struct mainspiralset* obj, int size, int zeta) {  //alloc array thing 
     obj->size = size;
     obj->zeta=zeta;
-    obj->Xs = (double*)calloc(size, sizeof(double));
-    obj->Ys = (double*)calloc(size, sizeof(double));
+    obj->Xs = (float*)calloc(size, sizeof(float));
+    obj->Ys = (float*)calloc(size, sizeof(float));
     
-    obj->complexxs = (double*)calloc(zeta* size,sizeof(double));
-    obj->complexys = (double*)calloc(zeta* size,sizeof(double));
+    obj->complexxs = (float*)calloc(zeta* size,sizeof(float));
+    obj->complexys = (float*)calloc(zeta* size,sizeof(float));
     
-    obj->colourr = (double*)calloc(zeta* size ,sizeof(double));
-    obj->colourg = (double*)calloc(zeta* size ,sizeof(double));
-    obj->colourb = (double*)calloc(zeta* size ,sizeof(double));
-    obj->colourbb = (double*)calloc(zeta* size, sizeof(double));     //probs not needed
+    obj->colourr = (float*)calloc(zeta* size ,sizeof(float));
+    obj->colourg = (float*)calloc(zeta* size ,sizeof(float));
+    obj->colourb = (float*)calloc(zeta* size ,sizeof(float));
+    obj->colourbb = (float*)calloc(zeta* size, sizeof(float));     //probs not needed
 }
 
 
@@ -218,9 +243,9 @@ void freeMainspiralset(struct mainspiralset *obj) {
 
 /*buffer[0] = tan(sin(x + l+ 1e-6)) * (a+ 1e-6)+z;
     buffer[1] = tan(cos(x + t+ 1e-6)) * (b+ 1e-6)+w; */ 
-void basespiral(double* xs, int sizeofxs, double* ys, double orignx, double origny, struct Spiral s) {
-    double a1 = s.a, b1 = s.b, l1 = s.l, t1 = s.t;
-    double a2 = s.a, b2 = s.b, l2 = s.l, t2 = s.t;
+void basespiral(float* xs, int sizeofxs, float* ys, float orignx, float origny, struct Spiral s) {
+    float a1 = s.a, b1 = s.b, l1 = s.l, t1 = s.t;
+    float a2 = s.a, b2 = s.b, l2 = s.l, t2 = s.t;
 
     if (xs == NULL || ys == NULL) {
         printf("Error: Received unallocated memory for xs/ys.\n");
@@ -228,7 +253,7 @@ void basespiral(double* xs, int sizeofxs, double* ys, double orignx, double orig
     }
 	int i;
     for (i = 0; i < sizeofxs; i++) {
-        double* spiralResult = SpiralGenBASE(i * a1, i * b1, l1, t1, i, orignx, origny);
+        float* spiralResult = SpiralGenBASE(i * a1, i * b1, l1, t1, i, orignx, origny);
         
         if (spiralResult == NULL) {
             printf("Error: SpiralGenBASE() returned NULL.\n");
@@ -242,9 +267,9 @@ void basespiral(double* xs, int sizeofxs, double* ys, double orignx, double orig
 }
 
 
-int render3dgraphicSPIRALComplexPlain(double* xs, int sizeofxs, double* ys,
-                                      double orignx, double origny, int zeta, 
-                                      double* complexx, double* complexy, struct Spiral s) {
+int render3dgraphicSPIRALComplexPlain(float* xs, int sizeofxs, float* ys,
+                                      float orignx, float origny, int zeta, 
+                                      float* complexx, float* complexy, struct Spiral s) {
     // Generates the base spiral, using preallocated memory
     basespiral(xs, sizeofxs, ys, orignx, origny, s);
 
@@ -262,25 +287,25 @@ int render3dgraphicSPIRALComplexPlain(double* xs, int sizeofxs, double* ys,
 
     return 0;
 }
-#define DBL_MAX 0.1
-#define MaxMinDistance 5
-#define Devisitor 20
-#define NOTDISTANCE 20
-int findclosetcoordinate(double *inputx, double *inputy, int size, double findx, double findy, int *index) {
+#define DBL_MAX 0.001
+#define MaxMinDistance 1
+#define Devisitor 2000
+#define NOTDISTANCE 2
+int findclosetcoordinate(float *inputx, float *inputy, int size, float findx, float findy, int *index) {
     if (size <= 0 || inputx == NULL || inputy == NULL || index == NULL) {
         return -1; // error: bad input
     }
 
-    double minDistance = DBL_MAX;
+    float minDistance = DBL_MAX;
     int indexOfSmallest = 0;
     int i;
 
     for (i = 0; i < size; i++) {
-        double dx = inputx[i] - findx;
-        double dy = inputy[i] - findy;
-        double dist = sqrt(dx * dx + dy * dy);  // Use proper Euclidean distance
+        float dx = inputx[i] - findx;
+        float dy = inputy[i] - findy;
+        float dist = sqrt(dx * dx + dy * dy);  // Use proper Euclidean distance
         if(dist>NOTDISTANCE){
-        	i=i+(int)(NOTDISTANCE/MaxMinDistance);
+        	i=i+(int)(NOTDISTANCE/MaxMinDistance) -1;
 		}else{
 			if (dist < minDistance) {
 	            minDistance = dist;
@@ -288,13 +313,13 @@ int findclosetcoordinate(double *inputx, double *inputy, int size, double findx,
 	        }
 	
 	        // Optional: break early if distance is "close enough"
-	        if (dist < (MaxMinDistance/Devisitor)+log(i)) {
+	        if (dist < (MaxMinDistance/Devisitor)) {
 	        	indexOfSmallest = i;
 	            break;
 	        }
 		}
     }
-	indexOfSmallest=0;
+	//indexOfSmallest=0;
     *index = indexOfSmallest;
     return 0;
 }
@@ -304,7 +329,7 @@ struct Textures{
 	int height; 
 	int width;
 	int COLOURPALLET;
-	double **texture3dArray; //  = {hieght, {width: cords{}, rgb or grayscale colours{}}}
+	float **texture3dArray; //  = {hieght, {width: cords{}, rgb or grayscale colours{}}}
 };
 int BasespiralTextureEncoder(){
 
@@ -334,7 +359,7 @@ typedef struct {
 } BMPInfoHeader;
 #pragma pack(pop)
 
-int getBMPTextures(char* filename, double ***textures, int* widthr, int* heightr) {
+int getBMPTextures(char* filename, float ***textures, int* widthr, int* heightr) {
     char debugMessage[1024];
 	char cwd[1024];
 	
@@ -387,10 +412,10 @@ int getBMPTextures(char* filename, double ***textures, int* widthr, int* heightr
     int rows = width * height;
     *widthr = bmpInfo.width;
     *heightr = bmpInfo.height;
-    *textures = (double**)malloc(rows * sizeof(double*));
+    *textures = (float**)malloc(rows * sizeof(float*));
     int i;
     for (i = 0; i < rows; i++) {
-        (*textures)[i] = (double*)calloc(5, sizeof(double));
+        (*textures)[i] = (float*)calloc(5, sizeof(float));
     }
 	int y; 
     for (y = 0; y < height; y++) {
@@ -428,59 +453,59 @@ int getBMPTextures(char* filename, double ***textures, int* widthr, int* heightr
 //.. ect
 
 struct worldmatrix{                  //top bottom side pollar views
-	double * boolstuffexr;   //x, r
-	double * boolstuffexfeta; //feta
-	double * boolstuffexzeta; //feta
+	float * boolstuffexr;   //x, r
+	float * boolstuffexfeta; //feta
+	float * boolstuffexzeta; //feta
 	size_t xrs;
 	size_t xrc;
 	
-	double * boolstuffexrf;   //the actuall floora value consistant with that that for pixles and stuff so that is not too fussed about i just need to figure out how to not loss information
-	double * boolstuffexfetaf;
-	double * boolstuffexzetaf;   //later change type to int 
+	float * boolstuffexrf;   //the actuall floora value consistant with that that for pixles and stuff so that is not too fussed about i just need to figure out how to not loss information
+	float * boolstuffexfetaf;
+	float * boolstuffexzetaf;   //later change type to int 
 	size_t xrfs;
 	size_t xrfc;
 	
 	int * localindexxs;
 	
-	double * boolstuffezr;
-	double * boolstuffezfeta;
-	double * boolstuffezzeta;
+	float * boolstuffezr;
+	float * boolstuffezfeta;
+	float * boolstuffezzeta;
 	size_t zrs;
 	size_t zrc;
 	
-	double * boolstuffezrf;
-	double * boolstuffezfetaf;
-	double * boolstuffezzetaf;
+	float * boolstuffezrf;
+	float * boolstuffezfetaf;
+	float * boolstuffezzetaf;
 	size_t zrfs;
 	size_t zrfc;
 	
 	int * localindexzs;
 	
 	
-	double * boolstuff;     //object are in bitmap occurding to thier values FLOORO for eg
+	float * boolstuff;     //object are in bitmap occurding to thier values FLOORO for eg
 	float scale;         //do not forget that this is float
 }; //pollar
 
 struct cameraview{//pollar
-	double * stuffenfeta;
-	double * stuffenfi;
-	double * stuffenr;
-	double * stuff;
+	float * stuffenfeta;
+	float * stuffenfi;
+	float * stuffenr;
+	float * stuff;
 };
 struct visibledomain{
-	double cameramaxfeta;          //0.60 woulbe 60*2 = 1.20      expresed in 60/360
-	double cameramaxfi;
-	double cameramaxr; //probs not needed render distance   expressed in units i in worlmatrix
+	float cameramaxfeta;          //0.60 woulbe 60*2 = 1.20      expresed in 60/360
+	float cameramaxfi;
+	float cameramaxr; //probs not needed render distance   expressed in units i in worlmatrix
 	
 	
-	double cameraorintationvx;     //xyz to make vector 
-	double cameraorintationvy;
-	double cameraorintationvz; //based on carisian plane where thing point basicly like compas compute based on cursor
+	float cameraorintationvx;     //xyz to make vector 
+	float cameraorintationvy;
+	float cameraorintationvz; //based on carisian plane where thing point basicly like compas compute based on cursor
 	
 	
-	double camerax;
-	double cameray;             //player position
-	double cameraz; 
+	float camerax;
+	float cameray;             //player position
+	float cameraz; 
 	struct worldmatrix ww1;
 	struct cameraview pp;
 };
@@ -511,17 +536,17 @@ struct object{
 	int weight;
 	int lenx;
 	int leny;
-	double ** vectorisedmodel;// list, vectorised form, x,y,z,rgb(3)
-	double relativecoordinates[6]; //x,y,z, pitch, yaw, role
+	float ** vectorisedmodel;// list, vectorised form, x,y,z,rgb(3)
+	float relativecoordinates[6]; //x,y,z, pitch, yaw, role
 	struct Textures texture; 
 };
 void initObject(struct object* obj, int weight) {
     obj->weight = weight;
     
-    obj->vectorisedmodel = (double**)malloc(weight * sizeof(double**));
+    obj->vectorisedmodel = (float**)malloc(weight * sizeof(float**));
     int i,j;
     for (i = 0; i < weight; i++) {
-        obj->vectorisedmodel[i] = (double*)malloc(6 * sizeof(double*));
+        obj->vectorisedmodel[i] = (float*)malloc(6 * sizeof(float*));
     }
 }
 
@@ -558,7 +583,7 @@ struct responsiveGuiObjects{
 int customeobjectfloor(struct totalassets *floor){
 	//char* path = "textures//floor.BMP";
 	floor->floor.texture.filepath = "C:\\Users\\maxik\\Documents\\school\\ASPIRE\\y10 agriculture fps\\spiralenginev3\\Game-c-engine-spiral\\textures\\floor.BMP";
-	double *** rettextarray = &floor->floor.texture.texture3dArray;
+	float *** rettextarray = &floor->floor.texture.texture3dArray;
 	int ret = getBMPTextures(floor->floor.texture.filepath, rettextarray, &floor->floor.texture.width, &floor->floor.texture.height);
 	if(ret == 1){
 		ShowPopup("could not lo11ad floor asset error at loading texture :<", "insfombia error cause yes!");
@@ -589,8 +614,8 @@ int customeobjectfloor(struct totalassets *floor){
 		floor->floor.vectorisedmodel[i][0] = floor->floor.texture.texture3dArray[i][0];
 		floor->floor.vectorisedmodel[i][1] = floor->floor.texture.texture3dArray[i][1];
 		floor->floor.vectorisedmodel[i][2] = 0;          //how impliment now well tilt goes first i suppose
-		floor->floor.vectorisedmodel[i][3] = 1.0f; //floor->floor.texture.texture3dArray[i][2];
-		floor->floor.vectorisedmodel[i][4] = 1.0f;//floor->floor.texture.texture3dArray[i][3];
+		floor->floor.vectorisedmodel[i][3] = floor->floor.texture.texture3dArray[i][2];
+		floor->floor.vectorisedmodel[i][4] = floor->floor.texture.texture3dArray[i][3];
 		floor->floor.vectorisedmodel[i][5] = floor->floor.texture.texture3dArray[i][4];
 		//floor->floor.vectorisedmodel[i][6] = 0.0f;
 			
@@ -638,13 +663,13 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 				
 				//generating pentigon
 				int n = allspirals->sfloor.zeta;
-				double *pointsx = (double*)calloc(n, sizeof(double));
-				double *pointsy = (double*)calloc(n, sizeof(double));
+				float *pointsx = (float*)calloc(n, sizeof(float));
+				float *pointsy = (float*)calloc(n, sizeof(float));
 				int k;
 				int pindex[n];
-				double r=totalass->floor.weight / n; //devide by zeta of main or the texture 
-				double feta=0;
-				double zeta = 0;
+				float r=totalass->floor.weight / n; //devide by zeta of main or the texture 
+				float feta=0;
+				float zeta = 0;
 				ShowPopup("width below 0", "insfombia error cause yes!");
 				nthpolygen(r,n,&pointsx, &pointsy);
 				ShowPopup("width below 1", "insfombia error cause yes!");
@@ -670,7 +695,7 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 					size_t n = VDA->ww1.xrs - 1;
 					VDA->ww1.xrs= buffer1;
 					VDA->ww1.xrc= buffer2;
-					double temp;
+					float temp;
 					//ShowPopup("width below 4", "insfombia error cause yes!");
 					temp = FLOORO;
 					append((void **)&VDA->ww1.boolstuffexrf, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &temp);
@@ -678,7 +703,7 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 					VDA->ww1.xrfc= buffer2;
 					temp = feta;
 					//ShowPopup("width below 41", "insfombia error cause yes!");
-					append((void **)&VDA->ww1.boolstuffexfeta, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(double), &temp);
+					append((void **)&VDA->ww1.boolstuffexfeta, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(float), &temp);
 					temp = FLOORO;
 					VDA->ww1.xrfs= buffer1;
 					VDA->ww1.xrfc= buffer2;
@@ -688,7 +713,7 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 					VDA->ww1.xrfs= buffer1;
 					VDA->ww1.xrfc= buffer2;
 					//ShowPopup("width below 43", "insfombia error cause yes!");
-					append((void **)&VDA->ww1.boolstuffexzeta, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(double), &temp);
+					append((void **)&VDA->ww1.boolstuffexzeta, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(float), &temp);
 					temp = FLOORO;
 					VDA->ww1.xrfs= buffer1;
 					VDA->ww1.xrfc= buffer2;
@@ -706,12 +731,12 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 				//then you finish in this function for this case, and you can do more latyer
 				//ok so the vector we need to apply is 0, 1, -3
 				int xyzstart[3] = {0,0,0};
-				int xyzend[3] = {0, 1, -100};
+				int xyzend[3] = {0, 0, 0};
 				spiralomnidirectionalcompute(&allspirals->sfloors, xyzstart, xyzend, 1);
-				double ** axs = &allspirals->sfloor.Xs;
-				double ** ays = &allspirals->sfloor.Ys;
-				double ** acomplexx = &allspirals->sfloor.complexxs;
-				double ** acomplexy = &allspirals->sfloor.complexys;
+				float ** axs = &allspirals->sfloor.Xs;
+				float ** ays = &allspirals->sfloor.Ys;
+				float ** acomplexx = &allspirals->sfloor.complexxs;
+				float ** acomplexy = &allspirals->sfloor.complexys;
 				render3dgraphicSPIRALComplexPlain(*axs, allspirals->sfloor.size, *ays, 0, 0, allspirals->sfloor.zeta, *acomplexx, *acomplexy, allspirals->sfloors);
 				xyzend[1] = -1;
 				xyzend[2] = +100;
@@ -755,13 +780,13 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 					size_t idx = VDA->ww1.zrs - 1;
 					VDA->ww1.zrfs= buffer1;
 					VDA->ww1.zrfc= buffer2;
-					double temp;
+					float temp;
 					temp = FLOORO;
 					append((void **)&VDA->ww1.boolstuffezrf, &VDA->ww1.zrfs, &VDA->ww1.zrfc, sizeof(int), &temp);
 					temp = feta;
 					VDA->ww1.zrs= buffer1;
 					VDA->ww1.zrc= buffer2;
-					append((void **)&VDA->ww1.boolstuffezfeta, &VDA->ww1.zrs, &VDA->ww1.zrc, sizeof(double), &temp);//greate crash
+					append((void **)&VDA->ww1.boolstuffezfeta, &VDA->ww1.zrs, &VDA->ww1.zrc, sizeof(float), &temp);//greate crash
 					temp = FLOORO;
 					VDA->ww1.zrfs= buffer1;
 					VDA->ww1.zrfc= buffer2;
@@ -769,7 +794,7 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 					temp = zeta;
 					VDA->ww1.zrs= buffer1;
 					VDA->ww1.zrc= buffer2;
-					append((void **)&VDA->ww1.boolstuffezzeta, &VDA->ww1.zrs, &VDA->ww1.zrc, sizeof(double), &temp);
+					append((void **)&VDA->ww1.boolstuffezzeta, &VDA->ww1.zrs, &VDA->ww1.zrc, sizeof(float), &temp);
 					temp = FLOORO;
 					VDA->ww1.zrfs= buffer1;
 					VDA->ww1.zrfc= buffer2;
@@ -827,18 +852,18 @@ void allobjectsrender(struct visibledomain *VDA, struct mainspiralset *main, str
 //	int xfetai[TSOVIEW];
 //	int xzetai[TSOVIEW];
 //	
-//	double TONTIxr[TSOVIEW];
-//	double TONTIxfeta[TSOVIEW];
-//	double TONTIxzeta[TSOVIEW];
+//	float TONTIxr[TSOVIEW];
+//	float TONTIxfeta[TSOVIEW];
+//	float TONTIxzeta[TSOVIEW];
 	//process the blockage of like light and entities here before actually go in and slowly sorting through all of them, make 0logn alg
 	//compute valid poistions based on camera angles and distance 
-	double deltacamerx = VDA->camerax - VDA->cameraorintationvx;
-	double deltacamery = VDA->cameray - VDA->cameraorintationvy;
-	double deltacamerz = VDA->cameraz - VDA->cameraorintationvz;
+	float deltacamerx = VDA->camerax - VDA->cameraorintationvx;
+	float deltacamery = VDA->cameray - VDA->cameraorintationvy;
+	float deltacamerz = VDA->cameraz - VDA->cameraorintationvz;
 	
-	double dynamiccamerafeta  = atan(deltacamerz/deltacamerx);           // VDA->pp.camera
-	double dynamiccamerazeta  = atan(deltacamerz/deltacamery);
-	double renderdistance = 20;
+	float dynamiccamerafeta  = atan(deltacamerz/deltacamerx);           // VDA->pp.camera
+	float dynamiccamerazeta  = atan(deltacamerz/deltacamery);
+	float renderdistance = 20;
 	float renderdistancescale=1;
 	int i;
 	int indexj =0;
@@ -854,8 +879,8 @@ void allobjectsrender(struct visibledomain *VDA, struct mainspiralset *main, str
 		}
 		
 	} //maybe maybe not
-	double scalex =1;
-	double scaley =1;
+	float scalex =1;
+	float scaley =1;
 	int l =0; 
 	int omega = sizeof(xri)/sizeof(int);;
 	for(i=0; i<=omega; i++){        //here is cancer
@@ -876,8 +901,8 @@ void allobjectsrender(struct visibledomain *VDA, struct mainspiralset *main, str
 				//scale the coordinates
 				scalex =1;
 				scaley =1;
-				double tempxmain = (VDA->ww1.boolstuffexfeta[xri[i]]) * scalex; //lighting VDA->ww1.boolstuffexr
-				double tempymain = (VDA->ww1.boolstuffexzeta[xri[i]]) * scaley;
+				float tempxmain = (VDA->ww1.boolstuffexfeta[xri[i]]) * scalex; //lighting VDA->ww1.boolstuffexr
+				float tempymain = (VDA->ww1.boolstuffexzeta[xri[i]]) * scaley;
 				
 				//then take int of tempxmain and take scale of zeta, then make string like and add to stuff
 				main->complexxs[(int)tempxmain] = tempxmain;
@@ -902,22 +927,7 @@ void allobjectsrender(struct visibledomain *VDA, struct mainspiralset *main, str
 	
 }
 
-/**************************
- * animations      (Ihate them)
- 
- 
- so, we have to import them or animate
- them with physics like the colours,
- 
- 
- ok so we make it so that joins are free mooving and 
- the characters that have join objects mean that these object can tug stuff
- but they are spirals 
- 
- so basiclly a water engine that behaves not like water 
- *
- **************************/
- 
+
  
  
  
