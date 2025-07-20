@@ -38,7 +38,7 @@ void playerkeys(){
 	//vk ask
 	if (GetAsyncKeyState('W') & 0x8000) {
     // W key is held down
-    //playerY += 0.01f; // Move forward
+    //playerY += 0.01f; // Move forward  //issue transformation by updating player coordinates and rerendering
 	}
 }
 

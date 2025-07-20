@@ -12,12 +12,5 @@
 //generating a fingerprint that the game scene will follow using regular coordinates(walls)
 //then generate a hash map of all these (single vector points)
 
-void algorthim(){
-}
-
-char* dissposableassets(){
-	return 0;
-}
-
 
 

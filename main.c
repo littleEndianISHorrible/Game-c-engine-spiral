@@ -77,6 +77,12 @@ int maxSize, double theta, double relativer){ // fin for now
         // Assuming maxSize is the full width/height of the OpenGL view in pixels
 		// and the spiral coordinates are centered at (0, 0)
 		//ShowPopup("pain", "pains");
+		if(main->complexxs[i] != main->complexxs[i]){
+			main->complexxs[i]=0;
+		}
+		if(main->complexys[i] != main->complexys[i]){
+			main->complexys[i] = 0;
+		}
 		long double XS = main->complexxs[i];
 		long double YS = main->complexys[i];
 
@@ -111,7 +117,7 @@ int maxSize, double theta, double relativer){ // fin for now
 		//glColor3f(main->colourr[i], main->colourg[i], main->colourb[i]);   weird bug
 		//printing the three
 		char buffer[200];
-		sprintf(buffer, "red, green, blue %lf, %lf, %lf, x y: %lf, %lf ;;; XS=%d YS=%d -> i %d", main->colourr[i], main->colourg[i], main->colourb[i], norm_x, norm_y, XS, YS, i);
+		sprintf(buffer, "red, green, blue %lf, %lf, %lf, x y: %lf, %lf ;;; XS=%Lf YS=%Lf -> i %d", main->colourr[i], main->colourg[i], main->colourb[i], main->complexxs[i], main->complexys[i], XS, YS, i);
 		//ShowPopup(buffer, "200");
 		//printToSidePanel( buffer , i); 
 		///glColor3f((main->colourr[i]), \main->colourg[i]), (main->colourb[i]));
@@ -137,15 +143,16 @@ int objectTospiralCoordinates(struct object *ob1, struct mainspiralset *object, 
 	if(size < 1){
 		ShowPopup("EMERGANCY", "insfombia error cause yes!");
 	}
-    int zeta=1000;
+    int zeta=500;
     initMainspiralset(object, size, zeta);
     if(objects->definefirst){
     	objects->a =  1/(ob1->texture.width / ob1->texture.height * 10);
 	    objects->b = 1/(ob1->texture.height /ob1->texture.width  * 10);
 	    objects->l = 0;
 	    objects->t = 0; 
-	    object->relitivescale = (objects->a + objects->b)*0.5;
+	    
 	}
+	object->relitivescale = (objects->a + objects->b)*0.5;
 	float ** axs = &object->Xs;
 	float ** ays = &object->Ys;
 	float ** acomplexx = &object->complexxs;
@@ -179,8 +186,8 @@ int objectTospiralCoordinates(struct object *ob1, struct mainspiralset *object, 
 		object->colourg[pindex] = (float)((green+c)/ 1);// 255.0);
 		object->colourb[pindex] = (float)((blue+c) / 1);// 255.0);
 		
-		object->complexxs[pindex]= (ob1->vectorisedmodel[i][0])- object->complexxs[pindex];//*/ + (ob1->vectorisedmodel[i][0] - object->complexxs[pindex])/2);
-		object->complexys[pindex]= (ob1->vectorisedmodel[i][1])- object->complexys[pindex];//*/ + (ob1->vectorisedmodel[i][1] - object->complexys[pindex])/2);
+		object->complexxs[pindex]= (ob1->vectorisedmodel[i][0] /*- (ob1->texture.width * 0.5)*/)- object->complexxs[pindex];//*/ + (ob1->vectorisedmodel[i][0] - object->complexxs[pindex])/2);
+		object->complexys[pindex]= (ob1->vectorisedmodel[i][1] /*- (ob1->texture.height * 0.5)*/)- object->complexys[pindex];//*/ + (ob1->vectorisedmodel[i][1] - object->complexys[pindex])/2);
 		
 																	   //test this block of code by  sneding to main spiral set th
 
@@ -314,7 +321,7 @@ void firstload(struct mainspiralset *main, struct Spiral *mains, int sizex, int 
     int size=sizex+sizey;
     int zeta=500; //impliment a varible scalling for ultimate preformance
     initMainspiralset(main, size, zeta);
-    mains->a = 0.5;
+    mains->a = 1;
     mains->b = 1; //+ (size/sizey);
     mains->l = 0;//theta;
     mains->t = 0; //1*(size/sizey); 
@@ -345,7 +352,7 @@ void objectrenderingEngine(int maxsize, HDC hDC, float theta, struct mainspirals
 	if(deltatime*1000 > 120){
 		//skip process frames compute physics and camera changes with input 
 		Sleep(10); //for now
-		ShowPopup("ntr he engine just could't render stuff correctly which means alot more bugs exists which i though i fixed'", "insfombia error cause yes!");
+		//ShowPopup("ntr he engine just could't render stuff correctly which means alot more bugs exists which i though i fixed'", "insfombia error cause yes!");
 	}else{
 		//recompute the thing withoutphysics and render 
 		int ret = configuresingularobjects(totalass, main, firstload, allspirals, VDA);
@@ -426,6 +433,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         } else {
         	//update deltatime
         	playerkeys();
+        	//scale(1,&main, &mains );
         	deltatime = clock() - deltatime;
         	openGLplotSpiral(&main, main.totalsize, hDC, maxsize, theta, 1);
 //        	if(deltatime*1000 < 60 && deltatime*1000 != 60){
@@ -434,6 +442,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         	//render
             objectrenderingEngine(maxsize, hDC, theta, &main, &mains, &totalass, &allspirals, &VDA);
             SwapBuffers(hDC);
+            rotate(0, 0.01,  &main, &mains );   //do not use relitive do a thing which adds or something
             //mains.t = -theta;
             //mains.a = 1/(sin(theta)*10);
             //theta += 0.1f;

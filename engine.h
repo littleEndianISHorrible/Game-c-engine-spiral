@@ -9,7 +9,7 @@
 #include <string.h>
 
 
-
+const float buli =1e-4f;
 void ShowPopup(const char* message, const char* title) { MessageBox(NULL, message, title, MB_OK | MB_ICONINFORMATION); }
 
 void append(void **array, size_t *size, size_t *capacity, size_t element_size, void *value) {
@@ -76,8 +76,8 @@ float AX(float x, struct Spiral i){return x*i.i;}
 float BX(float x, struct Spiral j){return x*j.j;}
 float* SpiralGenBASE(float a, float b, float l, float t, float x, float z, float w) {
     static float buffer[2];  // Static keeps the variable alive beyond function scope
-    buffer[0] = tan(sin(x + l+ 1e-6)) * (a+ 1e-6)+z;
-    buffer[1] = tan(cos(x + t+ 1e-6)) * (b+ 1e-6)+w;
+    buffer[0] = tan(sin(x + l+ 1e-6)+buli) * (a+ 1e-6)+z +buli;
+    buffer[1] = tan(cos(x + t+ 1e-6)+buli) * (b+ 1e-6)+w  +buli;
     return buffer;
 }
 #define PI 3.141592653589793
@@ -149,29 +149,7 @@ int reverseDigits(int num) {
  **************************/
  
  
-/**************************
- * spiral transformations
- *
- **************************/
 
-void spiralomnidirectionalcompute(struct Spiral *object, int *xyzvectora, int *xyzvectorb, float scale){            //x y z 1, x y z 2
-	float deltax = xyzvectorb[0] - xyzvectora[0];
-	float deltay = xyzvectorb[1] - xyzvectora[1];
-	float deltaz = xyzvectorb[2] - xyzvectora[2];
-	
-	deltax = scale*deltax;
-	deltay = scale*deltay;
-	deltaz = scale*deltaz;
-	object->a = object->a+atan(deltaz/deltax);
-	object->b = object->b+atan(deltaz/deltay);
-	object->t = object->t+(deltaz/deltax);
-	object->l = object->l+(deltaz/deltay);
-}
-
-void scale(){
-}
-void rotate(){
-}
 /**************************
  * textures
  *
@@ -267,22 +245,40 @@ void basespiral(float* xs, int sizeofxs, float* ys, float orignx, float origny, 
 }
 
 
-int render3dgraphicSPIRALComplexPlain(float* xs, int sizeofxs, float* ys,
-                                      float orignx, float origny, int zeta, 
+int render3dgraphicSPIRALComplexPlain(float* xs, int count_xs, float* ys,
+                                      float orignx, float origny, int zeta,
                                       float* complexx, float* complexy, struct Spiral s) {
-    // Generates the base spiral, using preallocated memory
-    basespiral(xs, sizeofxs, ys, orignx, origny, s);
-
-    int sizeofmainlist = sizeofxs * zeta;
+    if (xs == NULL || ys == NULL) {
+        printf("Error: xs or ys is NULL.\n");
+        return -2;
+    }
 
     if (complexx == NULL || complexy == NULL) {
         printf("Error: Received unallocated memory for complexx/complexy.\n");
         return -1;
     }
-    // Buffer arrays no longer needed since we use the preallocated memory
-    int i;
-    for (i = 0; i < sizeofxs; i++) {
+
+    if (zeta <= 0 || count_xs <= 0) {
+        printf("Error: Invalid array size.\n");
+        return -3;
+    }
+
+    // Fill xs and ys with base spiral
+    basespiral(xs, count_xs, ys, orignx, origny, s);
+
+	int i;
+    for (i= 0; i < count_xs; i++) {
+        // Bounds check: each sublist must have zeta entries
         basespiral(&complexx[i * zeta], zeta, &complexy[i * zeta], xs[i], ys[i], s);
+    }
+
+	int j;
+    // Optional: validate outputs for NaN
+    for (j = 0; j < count_xs * zeta; j++) {
+        if (complexx[j] != complexx[j] || complexy[j] != complexy[j]) {
+            //printf("Warning: NaN detected in spiral output at index %d\n", j);
+            // You can choose to return error or skip
+        }
     }
 
     return 0;
@@ -440,6 +436,123 @@ int getBMPTextures(char* filename, float ***textures, int* widthr, int* heightr)
     return 0;
 }
 
+/**************************
+ * spiral transformations
+ *
+ **************************/
+
+void spiralomnidirectionalcompute(struct Spiral *object, float *xyzvectora, float *xyzvectorb, float scale) {
+    float deltax = xyzvectorb[0] - xyzvectora[0];
+    float deltay = xyzvectorb[1] - xyzvectora[1];
+    float deltaz = xyzvectorb[2] - xyzvectora[2];
+
+    // Apply scaling uniformly
+    deltax *= scale;
+    deltay *= scale;
+    deltaz *= scale;
+
+    // Use atan2 for robust angle calculation
+    object->a = atan2f(deltaz, deltax);  // angle in xz plane
+    object->b = atan2f(deltaz, deltay);  // angle in yz plane
+
+    object->t = sqrtf(deltax * deltax + deltaz * deltaz);  // distance in xz plane
+    object->l = sqrtf(deltay * deltay + deltaz * deltaz);  // distance in yz plane
+}
+
+void scale(float scale, struct mainspiralset *object, struct Spiral *objects){
+	float xyzstart[3] = {0,0,0};
+	float xyzend[3] = {scale, 0, 0};
+	spiralomnidirectionalcompute(objects, xyzstart, xyzend, scale);
+	struct mainspiralset fi;
+	int size1=object->size;
+    int zeta1=object->zeta; //impliment a varible scalling for ultimate preformance
+    initMainspiralset(&fi, size1, zeta1);
+	float ** axs = &fi.Xs;
+	float ** ays = &fi.Ys;
+	float ** acomplexx = &fi.complexxs;
+	float ** acomplexy = &fi.complexys;
+	render3dgraphicSPIRALComplexPlain(*axs, fi.size, *ays, 0, 0, fi.zeta, *acomplexx, *acomplexy, *objects);
+	int i =0;
+	for(i=0; i< fi.size*fi.zeta; i++){
+		object->complexxs[i] = (scale* fi.complexxs[i] )+object->complexxs[i];
+		object->complexys[i] = (scale* fi.complexys[i] )+ object->complexys[i];
+	}
+	object->relitivescale = object->relitivescale+ (objects->a + objects->b * scale);
+}
+void rotate(float feta, float zeta, struct mainspiralset *object, struct Spiral *objects) {
+    float xyzstart[3] = {0.0f, 0.0f, 0.0f};
+    float xyzend[3] = {0.0f, feta, zeta};
+    float scale = 0.5f * (fabsf(feta) + fabsf(zeta));
+
+    // Compute orientation and scale
+    spiralomnidirectionalcompute(objects, xyzstart, xyzend, scale);
+
+    // Prepare new spiral transformation set
+    struct mainspiralset fi;
+    int size1 = object->size;
+    int zeta1 = object->zeta;
+    initMainspiralset(&fi, size1, zeta1);
+
+    render3dgraphicSPIRALComplexPlain(fi.Xs, size1, fi.Ys, 0, 0, zeta1, fi.complexxs, fi.complexys, *objects);
+
+    // Rotation matrix around Y-axis (assuming feta is angle around Y)
+    float angleY = feta;
+    float angleZ = zeta;
+    float cosY = cosf(angleY);
+    float sinY = sinf(angleY);
+    float cosZ = cosf(angleZ);
+    float sinZ = sinf(angleZ);
+	int i;
+    for (i = 0; i < size1 * zeta1; i++) {
+        // Apply Y-axis and Z-axis rotation to each point
+        float x = fi.complexxs[i];
+        float y = fi.complexys[i];
+        float newX = cosY * x - sinY * y;
+        float newY = sinZ * x + cosZ * y;
+
+        // Apply scaled transformation
+        object->complexxs[i] += scale * newX;
+        object->complexys[i] += scale * newY;
+    }
+
+    // Update relative scale based on rotation
+    object->relitivescale += (objects->a + objects->b * scale);
+}
+
+void apply(float x, float y, float z, struct mainspiralset *object, struct Spiral *objects){
+	float xyzstart[3] = {0,0,0};
+	float xyzend[3] = {x, y, z};
+	float scale = (x+y+z)*(1/3);
+	spiralomnidirectionalcompute(objects, xyzstart, xyzend, scale);
+	struct mainspiralset fi;
+	int size1=object->size;
+    int zeta1=object->zeta; //impliment a varible scalling for ultimate preformance
+    initMainspiralset(&fi, size1, zeta1);
+	float ** axs = &fi.Xs;
+	float ** ays = &fi.Ys;
+	float ** acomplexx = &fi.complexxs;
+	float ** acomplexy = &fi.complexys;
+	render3dgraphicSPIRALComplexPlain(*axs, fi.size, *ays, 0, 0, fi.zeta, *acomplexx, *acomplexy, *objects);
+	int i =0;
+	for(i=0; i< fi.size*fi.zeta; i++){
+		object->complexxs[i] = (scale* fi.complexxs[i] )+object->complexxs[i];
+		object->complexys[i] = (scale* fi.complexys[i] )+ object->complexys[i];
+	}
+	object->relitivescale = object->relitivescale+ (objects->a + objects->b * scale);
+}
+
+/*nt xyzstart[3] = {0,0,0};
+				int xyzend[3] = {0, 0, 0};
+				spiralomnidirectionalcompute(&allspirals->sfloors, xyzstart, xyzend, 1);
+				float ** axs = &allspirals->sfloor.Xs;
+				float ** ays = &allspirals->sfloor.Ys;
+				float ** acomplexx = &allspirals->sfloor.complexxs;
+				float ** acomplexy = &allspirals->sfloor.complexys;
+				render3dgraphicSPIRALComplexPlain(*axs, allspirals->sfloor.size, *ays, 0, 0, allspirals->sfloor.zeta, *acomplexx, *acomplexy, allspirals->sfloors);
+				xyzend[1] = -1;
+				xyzend[2] = +100;
+				spiralomnidirectionalcompute(&allspirals->sfloors, xyzstart, xyzend, 1);
+				*/
 
  
 /**************************
@@ -672,7 +785,7 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 				float zeta = 0;
 				ShowPopup("width below 0", "insfombia error cause yes!");
 				nthpolygen(r,n,&pointsx, &pointsy);
-				ShowPopup("width below 1", "insfombia error cause yes!");
+				
 				int buffer1, buffer2; 
 				r=0.00;                                             //;< huh
 				for(k=0; k<=n; k++){
@@ -685,9 +798,14 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 					    &pindex[n]
 					);                    // ok so round and the eq is r=sqr(x^2 +y2), feta = tan-1(y/x), z=z
 					//ShowPopup("width below 2", "insfombia error cause yes!");
-					r=pow(pow(totalass->floor.relativecoordinates[0]+allspirals->sfloor.complexxs[pindex[n] ],2)+pow(totalass->floor.relativecoordinates[1]+allspirals->sfloor.complexxs[pindex[n] ],2),0.5);//also zero 
-					feta=atan((totalass->floor.relativecoordinates[0]+allspirals->sfloor.complexxs[pindex[n] ])/ (totalass->floor.relativecoordinates[1]+allspirals->sfloor.complexxs[pindex[n] ]));   //feta zero
-					zeta = (totalass->floor.relativecoordinates[2]);   //also zero
+					float x = totalass->floor.relativecoordinates[0] + allspirals->sfloor.complexxs[pindex[n]];
+					float y = totalass->floor.relativecoordinates[1] + allspirals->sfloor.complexxs[pindex[n]];
+					float z = totalass->floor.relativecoordinates[2];
+					
+					// Add BULI to avoid sqrt(0) and division by zero in atan
+					r = sqrt(pow(x, 2) + pow(y, 2) + buli);  // ensures sqrt argument is > 0
+					feta = atan(x / (y + buli));            // prevents division by zero
+					zeta = z;    
 					//ShowPopup("width below 3", "insfombia error cause yes!");
 					buffer1 = VDA->ww1.xrs;
 					buffer2 = VDA->ww1.xrc;
@@ -725,13 +843,14 @@ void getcorrdsTerrian(char* assetsloaded, struct visibledomain *VDA, struct tota
 					append((void **)&VDA->ww1.localindexxs, &VDA->ww1.xrfs, &VDA->ww1.xrfc, sizeof(int), &k);
 					//ShowPopup("width below 46", "insfombia error cause yes!");                //crash between 3 and four for obvous reasons
 				}
+				ShowPopup("width below 1", "insfombia error cause yes!");
 				//rotate thing once or not at all just go through all and make knew really quickly how about threads 
 				//now apply the spiral alg to the points to see how changed
 				//then fill the polar things with it 
 				//then you finish in this function for this case, and you can do more latyer
 				//ok so the vector we need to apply is 0, 1, -3
-				int xyzstart[3] = {0,0,0};
-				int xyzend[3] = {0, 0, 0};
+				float xyzstart[3] = {0,0,0};
+				float xyzend[3] = {0, 0, 0};
 				spiralomnidirectionalcompute(&allspirals->sfloors, xyzstart, xyzend, 1);
 				float ** axs = &allspirals->sfloor.Xs;
 				float ** ays = &allspirals->sfloor.Ys;
@@ -901,9 +1020,14 @@ void allobjectsrender(struct visibledomain *VDA, struct mainspiralset *main, str
 				//scale the coordinates
 				scalex =1;
 				scaley =1;
-				float tempxmain = (VDA->ww1.boolstuffexfeta[xri[i]]) * scalex; //lighting VDA->ww1.boolstuffexr
-				float tempymain = (VDA->ww1.boolstuffexzeta[xri[i]]) * scaley;
-				
+				float tempxmain = (buli + VDA->ww1.boolstuffexfeta[xri[i]]) * scalex; //lighting VDA->ww1.boolstuffexr
+				float tempymain = (buli + VDA->ww1.boolstuffexzeta[xri[i]]) * scaley;
+				if(tempxmain < buli){
+					tempxmain = buli;
+				}
+				if(tempymain < buli){
+					tempymain = buli; 
+				}
 				//then take int of tempxmain and take scale of zeta, then make string like and add to stuff
 				main->complexxs[(int)tempxmain] = tempxmain;
 				main->complexys[(int)tempymain] = tempymain;
